@@ -2,7 +2,7 @@ import os
 import pytz
 import requests
 from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
 import tiktoken
 
@@ -23,7 +23,10 @@ try:
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
-
+@app.route('/')
+def index():
+    return render_template('index.html')
+    
 # Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
