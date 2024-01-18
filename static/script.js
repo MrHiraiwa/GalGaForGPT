@@ -29,6 +29,10 @@ function sendMessage() {
         postData.user_id = userId;
     }
 
+    // ユーザーのメッセージを即時にチャットボックスに表示
+    var chatBox = document.getElementById("chatBox");
+    addMessageWithAnimation(chatBox, message, true); // ユーザーメッセージを追加
+
     fetch('/webhook', {
         method: 'POST',
         headers: {
@@ -38,12 +42,12 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        var chatBox = document.getElementById("chatBox");
-        addMessageWithAnimation(chatBox, message, true); // ユーザーメッセージ
+        // ボットの返信をチャットボックスに表示
         addMessageWithAnimation(chatBox, data.reply, false); // ボットメッセージ
-        document.getElementById("userInput").value = '';
+        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
+
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
