@@ -1,6 +1,10 @@
 body {
+  display: flex;
+  flex-direction: column;
   justify-content: flex-end;
-  margin: 20px;
+  align-items: center; /* 中央揃え */
+  height: 100vh; /* ビューポートの高さに合わせる */
+  margin: 0;
   padding: 20px;
   font-size: clamp(15px, 1vw, 25px);
   background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
@@ -9,7 +13,6 @@ body {
   background-repeat: no-repeat;
   transition: background-image 2s ease-in-out, opacity 2s ease-in-out;
   opacity: 0;
-  transition: background-image 2s ease-in-out;
 }
 
 body.visible {
@@ -22,16 +25,13 @@ body.fadeout {
 }
 
 #chatBox {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px 0;
   min-height: calc(6 * 1.2em * 1.5);
   max-height: calc(6 * 1.2em * 1.5);
   width: 100%;
   overflow-y: scroll;
   border: 1px solid #ccc;
   padding: 5px;
-  margin-bottom: 0.5em;
   box-sizing: border-box;
   background-color: rgba(255, 255, 255, 0.7);
 }
@@ -50,10 +50,10 @@ body.fadeout {
 }
 
 .message-animation {
-    animation: fadeIn 0.5s;
+  animation: fadeIn 0.5s;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
