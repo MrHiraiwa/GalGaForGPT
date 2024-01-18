@@ -19,8 +19,6 @@ DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合
 GPT_MODEL = 'gpt-3.5-turbo'
 SYSTEM_PROMPT = '私は有能な秘書です。'
 MAX_TOKEN_NUM = 2000
-FORGET_KEYWORDS = ['忘れて']
-FORGET_MESSAGE = '会話ログを消去しました。'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -49,66 +47,58 @@ def index():
     
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
-    
+
+# Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
     data = request.json
     user_message = data.get("message")
     user_id = data.get("user_id")
+
+    # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
-
-    # トランザクションを開始し、update_in_transaction関数を呼び出す
-    transaction = db.transaction()
-    reply = update_in_transaction(transaction, doc_ref, user_message)
-    return jsonify({"reply": reply})
-
-@firestore.transactional
-def update_in_transaction(transaction, doc_ref, user_message):
-    encoding = tiktoken.encoding_for_model(GPT_MODEL)
-    user_doc = doc_ref.get(transaction=transaction)
-    if not user_doc.exists:
-        user_data = {
-            'messages': [],
-            'updated_date_string': nowDate,
-            'daily_usage': 0,
-            'start_free_day': datetime.now(jst)
-        }
-    else:
-        user_data = user_doc.to_dict()
-
-    # 忘れてコマンドの処理
-    if any(word in user_message for word in FORGET_KEYWORDS):
-        user_data['messages'] = []
-        transaction.set(doc_ref, user_data)
-        return FORGET_MESSAGE
-                        
-    total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
-    while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
-        user_data['messages'].pop(0)
+    @firestore.transactional
+    def update_in_transaction(transaction, doc_ref):
+        encoding = tiktoken.encoding_for_model(GPT_MODEL)
+        user_doc = doc_ref.get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+        else:
+            user_data = {
+                'messages': [],
+                'updated_date_string': nowDate,
+                'daily_usage': 0,
+                'start_free_day': datetime.now(jst)
+            }
             
-    # OpenAI API へのリクエスト
-    response = requests.post(
-        'https://api.openai.com/v1/chat/completions',
-        headers={'Authorization': f'Bearer {openai_api_key}'},
-        json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
-        timeout=50
-    )
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        
+        while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
+            user_data['messages'].pop(0)
+            
+        # OpenAI API へのリクエスト
+        response = requests.post(
+            'https://api.openai.com/v1/chat/completions',
+            headers={'Authorization': f'Bearer {openai_api_key}'},
+            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
+            timeout=50
+        )
 
-    if response.status_code == 200:
-        response_json = response.json()
-        bot_reply = response_json['choices'][0]['message']['content'].strip()
+        if response.status_code == 200:
+            response_json = response.json()
+            bot_reply = response_json['choices'][0]['message']['content'].strip()
 
-        # ユーザーとボットのメッセージをFirestoreに保存
-        user_data['messages'].append({'role': 'user', 'content': user_message})
-        user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
-        user_data['daily_usage'] += 1
-        user_data['updated_date_string'] = nowDate
-        doc_ref.set(user_data, merge=True)
+            # ユーザーとボットのメッセージをFirestoreに保存
+            user_data['messages'].append({'role': 'user', 'content': user_message})
+            user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
+            user_data['daily_usage'] += 1
+            user_data['updated_date_string'] = nowDate
+            doc_ref.set(user_data, merge=True)
 
-        return jsonify({"reply": bot_reply})
-    else:
-        print(f"Error with OpenAI API: {response.text}")
-        return jsonify({"error": "Unable to process your request"}), 500
+            return jsonify({"reply": bot_reply})
+        else:
+            print(f"Error with OpenAI API: {response.text}")
+            return jsonify({"error": "Unable to process your request"}), 500
     return update_in_transaction(db.transaction(), doc_ref)
 
 @app.route('/get_chat_log', methods=['GET'])
