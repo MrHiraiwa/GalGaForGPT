@@ -33,7 +33,7 @@ function sendMessage() {
 
     // 入力フィールドを直ちにクリア
     document.getElementById("userInput").value = '';
-
+    document.getElementById("userInput").disabled = true;
     // ユーザーIDの確認とメッセージデータの準備
     var postData = { message: message };
     if (userId !== null) {
