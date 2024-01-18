@@ -16,6 +16,9 @@ nowDate = datetime.now(jst)
 nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
 YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアントID
 DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
+GPT_MODEL = 'gpt-3.5-turbo'
+SYSTEM_PROMPT = '私は有能な秘書です。'
+MAX_TOKEN_NUM' = '2000'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -56,6 +59,7 @@ def webhook_handler():
     doc_ref = db.collection(u'users').document(user_id)
     @firestore.transactional
     def update_in_transaction(transaction, doc_ref):
+        encoding: Encoding = tiktoken.encoding_for_model(GPT_MODEL)
         user_doc = doc_ref.get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
@@ -66,12 +70,16 @@ def webhook_handler():
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst)
             }
-
+            
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(temp_messages)) + sum([len(encoding.encode(msg['content'])) for msg in user['messages']])
+        while total_chars > MAX_TOKEN_NUM and len(user['messages']) > 0:
+            user['messages'].pop(0)
+            
         # OpenAI API へのリクエスト
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
             headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': 'gpt-3.5-turbo', 'messages': [{'role': 'system', 'content': 'Your prompt here'}, {'role': 'user', 'content': user_message}]},
+            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': 'Your prompt here'}, {'role': 'user', 'content': user_message}]},
             timeout=50
         )
 
