@@ -1,4 +1,4 @@
-let userId = getUserIdFromCookie(); // CookieからユーザーIDを取得
+let userId = window.preloadedUserId; // サーバーサイドから提供されるユーザーID
 
 function getUserIdFromCookie() {
     const cookies = document.cookie.split('; ');
