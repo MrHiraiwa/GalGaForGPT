@@ -20,7 +20,7 @@ GPT_MODEL = 'gpt-3.5-turbo'
 SYSTEM_PROMPT = '私は有能な秘書です。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
-FORGET_MESSAGE　= '過去ログを消去しました。'
+FORGET_MESSAGE = '過去ログを消去しました。'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
