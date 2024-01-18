@@ -19,17 +19,30 @@ body.fadeout {
   opacity: 0;
   transition: opacity 2s ease-in-out;
 }
+
 #chatBox {
-    height: 300px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    padding: 10px;
-    overflow-y: scroll;
+  min-height: calc(6 * 1.2em * 1.5);
+  max-height: calc(6 * 1.2em * 1.5);
+  width: 100%;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-bottom: 0.5em;
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
-#userInput {
-    width: 80%;
-    padding: 10px;
+#userInput[type="text"] {
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid #ccc;
+  padding: 5px;
+  outline: none;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+#userInput[type="text"]:focus {
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .message-animation {
