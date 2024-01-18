@@ -51,6 +51,7 @@ function sendMessage() {
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
+    fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -59,3 +60,14 @@ window.onload = function() {
         }
     });
 };
+
+function fetchChatLog() {
+    fetch(`/get_chat_log?user_id=${userId}`)
+    .then(response => response.json())
+    .then(data => {
+        var chatBox = document.getElementById("chatBox");
+        data.forEach(message => {
+            addMessageWithAnimation(chatBox, message.content, message.role === 'user');
+        });
+    });
+}
