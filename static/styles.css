@@ -53,6 +53,16 @@ body.fadeout {
   animation: fadeIn 0.5s;
 }
 
+.input-area {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input-area button {
+    margin-left: 10px;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
