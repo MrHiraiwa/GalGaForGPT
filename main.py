@@ -58,13 +58,16 @@ def webhook_handler():
     user_id = data.get("user_id")
     doc_ref = db.collection(u'users').document(user_id)
 
-    # トランザクションを開始し、update_in_transaction関数を呼び出す
-    transaction = db.transaction()
-    reply = update_in_transaction(transaction, doc_ref, user_message)
-    return jsonify({"reply": reply})
+    try:
+        reply = update_in_transaction(doc_ref, user_message)
+        return jsonify({"reply": reply})
+    except Exception as e:
+        # エラーログを記録
+        print(f"Error in transaction: {e}")
+        # リトライロジックや代替処理をここに追加
+        return jsonify({"error": "Internal server error"}), 500
 
-@firestore.transactional
-def update_in_transaction(transaction, doc_ref, user_message):
+def update_in_transaction(doc_ref, user_message):
     encoding = tiktoken.encoding_for_model(GPT_MODEL)
     user_doc = doc_ref.get(transaction=transaction)
 
