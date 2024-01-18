@@ -1,3 +1,24 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: clamp(15px, 1vw, 25px);
+  background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 2s ease-in-out, opacity 2s ease-in-out;
+  opacity: 0;
+  transition: background-image 2s ease-in-out;
+}
+
+body.visible {
+  opacity: 1;
+}
+
+body.fadeout {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
 #chatBox {
     height: 300px;
     border: 1px solid #ddd;
