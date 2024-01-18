@@ -36,3 +36,36 @@ function sendMessage() {
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
 };
+
+function sendMessage() {
+    var message = document.getElementById("userInput").value;
+    // メッセージが空でないことを確認
+    if (!message.trim()) {
+        return;
+    }
+
+    var postData = { message: message };
+
+    // userIdがある場合のみpostDataに追加
+    if (userId !== null) {
+        postData.user_id = userId;
+    }
+
+    // その他のsendMessage関数のコード...
+
+    // メッセージ送信後に入力フィールドをクリア
+    document.getElementById("userInput").value = '';
+}
+
+// ページ読み込み時の処理
+window.onload = function() {
+    document.getElementById("chatContainer").style.display = "block";
+
+    // キーボードイベントリスナーの追加
+    document.getElementById("userInput").addEventListener('keypress', function(e) {
+        // エンターキーが押されたかどうかをチェック
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+};
