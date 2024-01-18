@@ -4,14 +4,15 @@ function onSignIn(googleUser) {
     var profile = googleUser.getBasicProfile();
     userId = profile.getId(); // ユーザーIDを取得
 
-    // ログインボタンを非表示にし、チャットコンテナを表示
-    document.getElementById("loginButton").style.display = "none";
+    // チャットコンテナを表示
     document.getElementById("chatContainer").style.display = "block";
 }
 
 function onFailure(error) {
     console.log(error);
     // ログイン失敗時の処理。必要に応じてここにコードを追加
+    // チャットコンテナを表示
+    document.getElementById("chatContainer").style.display = "block";
 }
 
 function sendMessage() {
@@ -38,15 +39,20 @@ function sendMessage() {
 }
 
 function renderButton() {
-    gapi.signin2.render('loginButton', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSignIn,
-        'onfailure': onFailure
-    });
+    if (document.getElementById("loginButton")) {
+        gapi.signin2.render('loginButton', {
+            'scope': 'profile email',
+            'width': 240,
+            'height': 50,
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onSignIn,
+            'onfailure': onFailure
+        });
+    } else {
+        // Googleログインボタンが存在しない場合は、チャットコンテナを直接表示
+        document.getElementById("chatContainer").style.display = "block";
+    }
 }
 
 // ページ読み込み時にGoogleログインボタンをレンダリング
