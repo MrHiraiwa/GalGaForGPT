@@ -78,8 +78,8 @@ function addBlankMessage(chatBox) {
     chatBox.appendChild(blankDiv);
     return blankDiv;
 }
-
 window.onload = function() {
+    document.body.classList.add('visible');
     document.getElementById("chatContainer").style.display = "block";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
