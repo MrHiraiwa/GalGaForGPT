@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot</title>
+    <title>ギャルゲーGPT</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
     <!-- ユーザーIDを事前に読み込む -->
@@ -15,7 +15,7 @@
     <div id="chatContainer">
         <div id="chatBox"></div>
         <input type="text" id="userInput">
-        <button onclick="sendMessage()">Send</button>
+        <button onclick="sendMessage()">文字で返信</button>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
