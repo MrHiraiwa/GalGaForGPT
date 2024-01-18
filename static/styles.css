@@ -64,6 +64,25 @@ body.fadeout {
     margin-left: 10px;
 }
 
+button {
+    background-color: #4CAF50; /* 緑色の背景 */
+    color: white; /* 白色のテキスト */
+    padding: 15px 32px; /* パディング */
+    text-align: center; /* テキストの中央揃え */
+    text-decoration: none; /* テキストの装飾を無効化 */
+    display: inline-block; /* インラインブロック要素として表示 */
+    font-size: 16px; /* フォントサイズ */
+    margin: 4px 2px; /* マージン */
+    cursor: pointer; /* カーソルをポインターに設定 */
+    border: 2px solid #4CAF50; /* 緑色のボーダー */
+    border-radius: 8px; /* 角の丸み */
+    box-shadow: 2px 2px 5px grey; /* 影を追加 */
+}
+
+button:hover {
+    background-color: #45a049; /* ホバー時の背景色を変更 */
+}
+
 
 @keyframes fadeIn {
   from { opacity: 0; }
