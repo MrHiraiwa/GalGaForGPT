@@ -21,6 +21,7 @@ SYSTEM_PROMPT = '私は有能な秘書です。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
+ERROR_MESSAGE = 'システムエラーが発生しています。'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -103,8 +104,6 @@ def webhook_handler():
                 print(f"Error with OpenAI API: {response.text}")
                 return jsonify({"error": "Unable to process your request"}), 500
         return update_in_transaction(db.transaction(), doc_ref)
-    except ResetMemoryException:
-        return 'OK'
     except KeyError:
         return 'Not a valid JSON', 200 
     except Exception as e:
