@@ -19,6 +19,8 @@ DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合
 GPT_MODEL = 'gpt-3.5-turbo'
 SYSTEM_PROMPT = '私は有能な秘書です。'
 MAX_TOKEN_NUM = 2000
+FORGET_KEYWORDS = ['忘れて']
+FORGET_MESSAGE　= '過去ログを消去しました。'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -70,6 +72,11 @@ def webhook_handler():
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst)
             }
+            
+        if any(word in user_message for word in FORGET_KEYWORDS):
+            user_data['messages'] = []
+            transaction.set(doc_ref, user_data, merge=True)
+            return jsonify({"reply": FORGET_MESSAGE})   
             
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
