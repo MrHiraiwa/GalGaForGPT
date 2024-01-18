@@ -1,4 +1,12 @@
-let userId = null; // ユーザーIDを初期化
+let userId = getUserIdFromCookie(); // CookieからユーザーIDを取得
+
+function getUserIdFromCookie() {
+    // CookieからユーザーIDを取得するコード
+    // この部分はロードバランサの設定に応じて変更する必要がある
+    const cookies = document.cookie.split('; ');
+    const userCookie = cookies.find(row => row.startsWith('userId='));
+    return userCookie ? userCookie.split('=')[1] : null;
+}
 
 function sendMessage() {
     var message = document.getElementById("userInput").value;
