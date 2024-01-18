@@ -53,11 +53,12 @@ function sendMessage() {
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = (isUser ? "You: " : "Bot: ") + message;
     let i = 0;
-
+    
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
+            messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
             setTimeout(typeWriter, 50);
         } else if (!isUser) {
             document.getElementById("userInput").disabled = false; // ボットメッセージのアニメーションが終わったら入力ボックスを有効化
