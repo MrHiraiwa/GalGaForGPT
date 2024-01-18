@@ -60,8 +60,10 @@ body.fadeout {
 }
 
 .input-area button {
+    min-width: 100px;
     margin-left: 10px;
 }
+
 
 @keyframes fadeIn {
   from { opacity: 0; }
