@@ -14,8 +14,10 @@
 <body class="visible">
     <div id="chatContainer">
         <div id="chatBox"></div>
-        <input type="text" id="userInput">
-        <button onclick="sendMessage()">文字で返信</button>
+        <div class="input-area">
+            <input type="text" id="userInput">
+            <button onclick="sendMessage()">文字で返信</button>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
