@@ -73,7 +73,7 @@ def webhook_handler():
             
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(temp_messages)) + sum([len(encoding.encode(msg['content'])) for msg in user['messages']])
         while total_chars > MAX_TOKEN_NUM and len(user['messages']) > 0:
-            user['messages'].pop(0)
+            user_data['messages'].pop(0)
             
         # OpenAI API へのリクエスト
         response = requests.post(
