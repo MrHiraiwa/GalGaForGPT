@@ -62,6 +62,8 @@ function setUserMessage(messageDiv, message, isUser) {
             setTimeout(typeWriter, 50);
         } else if (!isUser) {
             document.getElementById("userInput").disabled = false; // ボットメッセージのアニメーションが終わったら入力ボックスを有効化
+            document.getElementById("userInput").focus(); // 入力ボックスにフォーカスを設定
+
         }
     }
 
