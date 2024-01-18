@@ -65,9 +65,8 @@ def webhook_handler():
 
 @firestore.transactional
 def update_in_transaction(transaction, doc_ref, user_message):
+    # トランザクションを使用したFirestoreの操作を行う
     encoding = tiktoken.encoding_for_model(GPT_MODEL)
-    
-    # トランザクションを使用してドキュメントを取得
     user_doc = doc_ref.get(transaction=transaction)
 
     if user_doc.exists:
