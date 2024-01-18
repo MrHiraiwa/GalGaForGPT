@@ -9,15 +9,14 @@ function getUserIdFromCookie() {
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
-    messageDiv.className = 'message-animation'; // アニメーション用のクラスを追加
+    messageDiv.className = 'message-animation';
     chatBox.appendChild(messageDiv);
 
-    // アニメーションが終了したら、スクロールを最新のメッセージに移動
-    messageDiv.addEventListener('animationend', function() {
-        messageDiv.classList.remove('message-animation');
-        messageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
-    });
+    // スムーズスクロールの実行
+    messageDiv.scrollIntoView({ behavior: 'smooth' });
+
 }
+
 
 
 function sendMessage() {
