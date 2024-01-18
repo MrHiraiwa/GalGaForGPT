@@ -89,5 +89,16 @@ def webhook_handler():
         print(f"Error with OpenAI API: {response.text}")
         return jsonify({"error": "Unable to process your request"}), 500
 
+@app.route('/get_chat_log', methods=['GET'])
+def get_chat_log():
+    user_id = request.args.get('user_id')
+    doc_ref = db.collection(u'users').document(user_id)
+    user_doc = doc_ref.get()
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+        return jsonify(user_data['messages'])
+    else:
+        return jsonify([])
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
