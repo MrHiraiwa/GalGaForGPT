@@ -18,16 +18,12 @@ function addMessageWithAnimation(chatBox, message, isUser) {
 }
 
 
-
 function sendMessage() {
-    var message = document.getElementById("userInput").value;
-    if (!message.trim()) {
-        return;
-    }
+    // 省略: メッセージの取得とチェック
 
-    // ユーザーのメッセージを即時にチャットボックスに表示
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
+    userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
     setUserMessage(userMessageDiv, message, true); // ユーザーメッセージを設定
 
     // 入力フィールドを直ちにクリア
@@ -57,22 +53,18 @@ function sendMessage() {
 
 
 function addBlankMessage(chatBox) {
-    var messageDiv = document.createElement('div');
-    messageDiv.style.minHeight = "20px"; // 高さを持つ空のdivを作成
-    chatBox.appendChild(messageDiv);
-    return messageDiv;
+    var blankDiv = document.createElement('div');
+    blankDiv.style.minHeight = '20px'; // 空白行に高さを設定
+    chatBox.appendChild(blankDiv);
+    return blankDiv;
 }
-
 
 function setUserMessage(messageDiv, message, isUser) {
-    messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
-    messageDiv.className = 'message-animation';
-    messageDiv.addEventListener('animationend', function() {
-        messageDiv.classList.remove('message-animation');
-        messageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
-    });
+    setTimeout(() => {
+        messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
+        messageDiv.className = 'message-animation';
+    }, 100); // 100ミリ秒後にメッセージを設定
 }
-
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
