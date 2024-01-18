@@ -2,10 +2,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: center; /* 中央揃え */
-  height: 100vh; /* ビューポートの高さに合わせる */
+  align-items: center;
+  height: 100vh;
   margin: 0;
-  padding: 20px;
+  padding: 0; /* パディングを削除または小さく設定 */
   font-size: clamp(15px, 1vw, 25px);
   background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
   background-size: cover;
@@ -25,7 +25,7 @@ body.fadeout {
 }
 
 #chatBox {
-  margin: 10px 0;
+  margin: 5px 0; /* マージンを小さく設定 */
   min-height: calc(6 * 1.2em * 1.5);
   max-height: calc(6 * 1.2em * 1.5);
   width: 100%;
@@ -54,9 +54,10 @@ body.fadeout {
 }
 
 .input-area {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 5px; /* 下部のマージンを調整 */
 }
 
 .input-area button {
