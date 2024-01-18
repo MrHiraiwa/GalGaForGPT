@@ -18,7 +18,7 @@ YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアン
 DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
 GPT_MODEL = 'gpt-3.5-turbo'
 SYSTEM_PROMPT = '私は有能な秘書です。'
-MAX_TOKEN_NUM' = 2000
+MAX_TOKEN_NUM = 2000
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -72,7 +72,7 @@ def webhook_handler():
             }
             
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
-        while total_chars > MAX_TOKEN_NUM and len(user['messages']) > 0:
+        while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
             
         # OpenAI API へのリクエスト
