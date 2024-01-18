@@ -26,9 +26,8 @@ function sendMessage() {
         return;
     }
 
-    // ユーザーメッセージ用の空白行を追加
     var chatBox = document.getElementById("chatBox");
-    var userMessageDiv = addBlankMessage(chatBox);
+    var userMessageDiv = addBlankMessage(chatBox); // ユーザーメッセージ用の空白行を追加
 
     var postData = { message: message };
     if (userId !== null) {
@@ -44,29 +43,31 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        // ボットメッセージ用の空白行を追加
-        var botMessageDiv = addBlankMessage(chatBox);
-
-        // ユーザーメッセージとボットメッセージを設定
-        setUserMessage(userMessageDiv, message, true);
-        setUserMessage(botMessageDiv, data.reply, false);
+        setUserMessage(userMessageDiv, message, true); // ユーザーメッセージを設定
+        var botMessageDiv = addBlankMessage(chatBox); // ボットメッセージ用の空白行を追加
+        setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
+        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
 
+
 function addBlankMessage(chatBox) {
     var messageDiv = document.createElement('div');
+    messageDiv.style.minHeight = "20px"; // 高さを持つ空のdivを作成
     chatBox.appendChild(messageDiv);
-    messageDiv.scrollIntoView({ behavior: 'smooth' });
     return messageDiv;
 }
+
 
 function setUserMessage(messageDiv, message, isUser) {
     messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
     messageDiv.className = 'message-animation';
     messageDiv.addEventListener('animationend', function() {
         messageDiv.classList.remove('message-animation');
+        messageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
     });
 }
+
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
