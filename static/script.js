@@ -26,14 +26,14 @@ function sendMessage() {
         return;
     }
 
+    // ユーザーメッセージ用の空白行を追加
+    var chatBox = document.getElementById("chatBox");
+    var userMessageDiv = addBlankMessage(chatBox);
+
     var postData = { message: message };
     if (userId !== null) {
         postData.user_id = userId;
     }
-
-    // ユーザーのメッセージを即時にチャットボックスに表示
-    var chatBox = document.getElementById("chatBox");
-    addMessageWithAnimation(chatBox, message, true); // ユーザーメッセージを追加
 
     fetch('/webhook', {
         method: 'POST',
@@ -44,12 +44,29 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        // ボットの返信をチャットボックスに表示
-        addMessageWithAnimation(chatBox, data.reply, false); // ボットメッセージ
-        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
+        // ボットメッセージ用の空白行を追加
+        var botMessageDiv = addBlankMessage(chatBox);
+
+        // ユーザーメッセージとボットメッセージを設定
+        setUserMessage(userMessageDiv, message, true);
+        setUserMessage(botMessageDiv, data.reply, false);
     });
 }
 
+function addBlankMessage(chatBox) {
+    var messageDiv = document.createElement('div');
+    chatBox.appendChild(messageDiv);
+    messageDiv.scrollIntoView({ behavior: 'smooth' });
+    return messageDiv;
+}
+
+function setUserMessage(messageDiv, message, isUser) {
+    messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
+    messageDiv.className = 'message-animation';
+    messageDiv.addEventListener('animationend', function() {
+        messageDiv.classList.remove('message-animation');
+    });
+}
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
