@@ -54,6 +54,7 @@ function sendMessage() {
         var botMessageDiv = addBlankMessage(chatBox);
         userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
+        userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
     });
 }
 
