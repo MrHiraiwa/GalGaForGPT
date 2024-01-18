@@ -54,40 +54,43 @@ def webhook_handler():
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
-    user_doc = doc_ref.get()
-    if user_doc.exists:
-        user_data = user_doc.to_dict()
-    else:
-        user_data = {
-            'messages': [],
-            'updated_date_string': nowDate,
-            'daily_usage': 0,
-            'start_free_day': datetime.now(jst)
-        }
+    @firestore.transactional
+    def update_in_transaction(transaction, doc_ref):
+        user_doc = doc_ref.get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+        else:
+            user_data = {
+                'messages': [],
+                'updated_date_string': nowDate,
+                'daily_usage': 0,
+                'start_free_day': datetime.now(jst)
+            }
 
-    # OpenAI API へのリクエスト
-    response = requests.post(
-        'https://api.openai.com/v1/chat/completions',
-        headers={'Authorization': f'Bearer {openai_api_key}'},
-        json={'model': 'gpt-3.5-turbo', 'messages': [{'role': 'system', 'content': 'Your prompt here'}, {'role': 'user', 'content': user_message}]},
-        timeout=50
-    )
+        # OpenAI API へのリクエスト
+        response = requests.post(
+            'https://api.openai.com/v1/chat/completions',
+            headers={'Authorization': f'Bearer {openai_api_key}'},
+            json={'model': 'gpt-3.5-turbo', 'messages': [{'role': 'system', 'content': 'Your prompt here'}, {'role': 'user', 'content': user_message}]},
+            timeout=50
+        )
 
-    if response.status_code == 200:
-        response_json = response.json()
-        bot_reply = response_json['choices'][0]['message']['content'].strip()
+        if response.status_code == 200:
+            response_json = response.json()
+            bot_reply = response_json['choices'][0]['message']['content'].strip()
 
-        # ユーザーとボットのメッセージをFirestoreに保存
-        user_data['messages'].append({'role': 'user', 'content': user_message})
-        user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
-        user_data['daily_usage'] += 1
-        user_data['updated_date_string'] = nowDate
-        doc_ref.set(user_data, merge=True)
+            # ユーザーとボットのメッセージをFirestoreに保存
+            user_data['messages'].append({'role': 'user', 'content': user_message})
+            user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
+            user_data['daily_usage'] += 1
+            user_data['updated_date_string'] = nowDate
+            doc_ref.set(user_data, merge=True)
 
-        return jsonify({"reply": bot_reply})
-    else:
-        print(f"Error with OpenAI API: {response.text}")
-        return jsonify({"error": "Unable to process your request"}), 500
+            return jsonify({"reply": bot_reply})
+        else:
+            print(f"Error with OpenAI API: {response.text}")
+            return jsonify({"error": "Unable to process your request"}), 500
+    return update_in_transaction(db.transaction(), doc_ref)
 
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
