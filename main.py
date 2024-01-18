@@ -49,14 +49,17 @@ def index():
     
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
-
+    
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
     data = request.json
     user_message = data.get("message")
     user_id = data.get("user_id")
     doc_ref = db.collection(u'users').document(user_id)
-    reply = update_in_transaction(doc_ref, user_message)
+
+    # トランザクションを開始し、update_in_transaction関数を呼び出す
+    transaction = db.transaction()
+    reply = update_in_transaction(transaction, doc_ref, user_message)
     return jsonify({"reply": reply})
 
 @firestore.transactional
