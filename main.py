@@ -56,52 +56,58 @@ def webhook_handler():
     data = request.json
     user_message = data.get("message")
     user_id = data.get("user_id")
-
-    # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
-    @firestore.transactional
-    def update_in_transaction(transaction, doc_ref):
-        encoding = tiktoken.encoding_for_model(GPT_MODEL)
-        user_doc = doc_ref.get()
-        if user_doc.exists:
-            user_data = user_doc.to_dict()
-        else:
-            user_data = {
-                'messages': [],
-                'updated_date_string': nowDate,
-                'daily_usage': 0,
-                'start_free_day': datetime.now(jst)
-            }
+
+    # トランザクションを使用した更新処理を呼び出す
+    try:
+        return update_in_transaction(db.transaction(), doc_ref, user_message)
+    except Exception as e:
+        print(f"Error in transaction: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@firestore.transactional
+def update_in_transaction(transaction, doc_ref, user_message):
+    encoding = tiktoken.encoding_for_model(GPT_MODEL)
+    user_doc = doc_ref.get(transaction=transaction)
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+    else:
+        user_data = {
+            'messages': [],
+            'updated_date_string': nowDate,
+            'daily_usage': 0,
+            'start_free_day': datetime.now(jst)
+        }
             
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+    total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
-        while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
-            user_data['messages'].pop(0)
+    while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
+        user_data['messages'].pop(0)
             
-        # OpenAI API へのリクエスト
-        response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
-            timeout=50
-        )
+    # OpenAI API へのリクエスト
+    response = requests.post(
+        'https://api.openai.com/v1/chat/completions',
+        headers={'Authorization': f'Bearer {openai_api_key}'},
+        json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
+        timeout=50
+    )
 
-        if response.status_code == 200:
-            response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+    if response.status_code == 200:
+        response_json = response.json()
+        bot_reply = response_json['choices'][0]['message']['content'].strip()
 
-            # ユーザーとボットのメッセージをFirestoreに保存
-            user_data['messages'].append({'role': 'user', 'content': user_message})
-            user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
-            user_data['daily_usage'] += 1
-            user_data['updated_date_string'] = nowDate
-            doc_ref.set(user_data, merge=True)
+        # ユーザーとボットのメッセージをFirestoreに保存
+        user_data['messages'].append({'role': 'user', 'content': user_message})
+        user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
+        user_data['daily_usage'] += 1
+        user_data['updated_date_string'] = nowDate
+        doc_ref.set(user_data, merge=True)
 
-            return jsonify({"reply": bot_reply})
-        else:
-            print(f"Error with OpenAI API: {response.text}")
-            return jsonify({"error": "Unable to process your request"}), 500
-    return update_in_transaction(db.transaction(), doc_ref)
+        return jsonify({"reply": bot_reply})
+    else:
+        print(f"Error with OpenAI API: {response.text}")
+        return jsonify({"error": "Unable to process your request"}), 500
+return update_in_transaction(db.transaction(), doc_ref)
 
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
