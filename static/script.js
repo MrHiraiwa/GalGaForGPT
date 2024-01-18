@@ -26,14 +26,21 @@ function sendMessage() {
         return;
     }
 
+    // ユーザーのメッセージを即時にチャットボックスに表示
     var chatBox = document.getElementById("chatBox");
-    var userMessageDiv = addBlankMessage(chatBox); // ユーザーメッセージ用の空白行を追加
+    var userMessageDiv = addBlankMessage(chatBox);
+    setUserMessage(userMessageDiv, message, true); // ユーザーメッセージを設定
 
+    // 入力フィールドを直ちにクリア
+    document.getElementById("userInput").value = '';
+
+    // ユーザーIDの確認とメッセージデータの準備
     var postData = { message: message };
     if (userId !== null) {
         postData.user_id = userId;
     }
 
+    // サーバーへのリクエスト
     fetch('/webhook', {
         method: 'POST',
         headers: {
@@ -43,10 +50,9 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        setUserMessage(userMessageDiv, message, true); // ユーザーメッセージを設定
-        var botMessageDiv = addBlankMessage(chatBox); // ボットメッセージ用の空白行を追加
+        // ボットの返信をチャットボックスに表示
+        var botMessageDiv = addBlankMessage(chatBox);
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
-        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
 
