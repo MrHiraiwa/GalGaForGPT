@@ -1,6 +1,6 @@
 body {
-  margin: 0;
-  padding: 0;
+  margin: 20px;
+  padding: 20px;
   font-size: clamp(15px, 1vw, 25px);
   background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
   background-size: cover;
@@ -21,6 +21,9 @@ body.fadeout {
 }
 
 #chatBox {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
   min-height: calc(6 * 1.2em * 1.5);
   max-height: calc(6 * 1.2em * 1.5);
   width: 100%;
