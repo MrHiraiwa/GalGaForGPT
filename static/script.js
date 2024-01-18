@@ -54,8 +54,6 @@ function sendMessage() {
         var botMessageDiv = addBlankMessage(chatBox);
         userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
-        time.sleep(5)
-        userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
     });
 }
 
@@ -76,13 +74,15 @@ function setUserMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            setTimeout(typeWriter, 50); // 50ミリ秒の遅延で次の文字を表示
+            messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
+            setTimeout(typeWriter, 50); // 次の文字を表示
         }
     }
 
     typeWriter(); // タイピング効果の開始
     messageDiv.className = 'message-animation';
 }
+
 
 window.onload = function() {
     document.getElementById("chatContainer").style.display = "block";
