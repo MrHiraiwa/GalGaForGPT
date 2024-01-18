@@ -18,8 +18,13 @@ function addMessageWithAnimation(chatBox, message, isUser) {
 }
 
 
+
+
 function sendMessage() {
-    // 省略: メッセージの取得とチェック
+    var message = document.getElementById("userInput").value;
+    if (!message.trim()) {
+        return;
+    }
 
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
