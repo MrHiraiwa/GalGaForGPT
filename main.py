@@ -4,6 +4,8 @@ import requests
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 import tiktoken
 
 # 環境変数
@@ -12,6 +14,8 @@ secret_key = os.getenv('SECRET_KEY')
 jst = pytz.timezone('Asia/Tokyo')
 nowDate = datetime.now(jst) 
 nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
+YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアントID
+DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -23,10 +27,24 @@ try:
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
-@app.route('/')
+
+def validate_iap_jwt(iap_jwt, expected_audience):
+    try:
+        decoded_jwt = id_token.verify_token(
+            iap_jwt, google_requests.Request(), audience=expected_audience,
+            certs_url='https://www.gstatic.com/iap/verify/public_key')
+        return (decoded_jwt['sub'], decoded_jwt['email'], '')
+    except Exception as e:
+        return (DEFAULT_USER_ID, None, '**ERROR: JWT validation error {}**'.format(e))
+
+@app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, YOUR_AUDIENCE)
     
+    # この情報をフロントエンドに渡す
+    return render_template('index.html', user_id=user_id, user_email=user_email)
+
 # Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
