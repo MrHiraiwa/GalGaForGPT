@@ -3,7 +3,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  height: 95vh;
+  height: 94vh;
   margin: 0 20px;
   padding: 10px; /* パディングを適切に設定 */
   font-size: clamp(15px, 1vw, 25px);
