@@ -65,19 +65,18 @@ def webhook_handler():
 
 @firestore.transactional
 def update_in_transaction(transaction, doc_ref, user_message):
-    # トランザクションを使用したFirestoreの操作を行う
     encoding = tiktoken.encoding_for_model(GPT_MODEL)
     user_doc = doc_ref.get(transaction=transaction)
 
-    if user_doc.exists:
-        user_data = user_doc.to_dict()
-    else:
+    if not user_doc.exists:
         user_data = {
             'messages': [],
             'updated_date_string': nowDate,
             'daily_usage': 0,
             'start_free_day': datetime.now(jst)
         }
+    else:
+        user_data = user_doc.to_dict()
             
     if any(word in user_message for word in FORGET_KEYWORDS):
         user_data['messages'] = []
