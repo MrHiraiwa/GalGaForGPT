@@ -52,6 +52,7 @@ function sendMessage() {
     .then(data => {
         // ボットの返信をチャットボックスに表示
         var botMessageDiv = addBlankMessage(chatBox);
+        userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
     });
 }
