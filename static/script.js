@@ -69,17 +69,20 @@ function addBlankMessage(chatBox) {
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = (isUser ? "You: " : "Bot: ") + message;
     let i = 0;
+    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
 
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
-            setTimeout(typeWriter, 50); // 次の文字を表示
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(typeWriter, 50);
+        } else {
+            document.getElementById("userInput").disabled = false; // 入力ボックスを再び有効化
         }
     }
 
-    typeWriter(); // タイピング効果の開始
+    typeWriter();
     messageDiv.className = 'message-animation';
 }
 
