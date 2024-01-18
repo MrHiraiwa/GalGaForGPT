@@ -6,14 +6,26 @@ function getUserIdFromCookie() {
     return userCookie ? userCookie.split('=')[1] : null;
 }
 
+function addMessageWithAnimation(chatBox, message, isUser) {
+    var messageDiv = document.createElement('div');
+    messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
+    messageDiv.className = 'message-animation'; // アニメーション用のクラスを追加
+    chatBox.appendChild(messageDiv);
+
+    // アニメーションが終了したら、メッセージを追加
+    messageDiv.addEventListener('animationend', function() {
+        messageDiv.classList.remove('message-animation');
+    });
+}
+
 function sendMessage() {
     var message = document.getElementById("userInput").value;
-    if (!message.trim()) { // メッセージが空でないことを確認
+    if (!message.trim()) {
         return;
     }
 
     var postData = { message: message };
-    if (userId !== null) { // userIdがある場合のみpostDataに追加
+    if (userId !== null) {
         postData.user_id = userId;
     }
 
@@ -27,9 +39,9 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         var chatBox = document.getElementById("chatBox");
-        chatBox.innerHTML += `<div>You: ${message}</div>`;
-        chatBox.innerHTML += `<div>Bot: ${data.reply}</div>`;
-        document.getElementById("userInput").value = ''; // メッセージ送信後に入力フィールドをクリア
+        addMessageWithAnimation(chatBox, message, true); // ユーザーメッセージ
+        addMessageWithAnimation(chatBox, data.reply, false); // ボットメッセージ
+        document.getElementById("userInput").value = '';
     });
 }
 
