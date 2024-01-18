@@ -12,11 +12,13 @@ function addMessageWithAnimation(chatBox, message, isUser) {
     messageDiv.className = 'message-animation'; // アニメーション用のクラスを追加
     chatBox.appendChild(messageDiv);
 
-    // アニメーションが終了したら、メッセージを追加
+    // アニメーションが終了したら、スクロールを最新のメッセージに移動
     messageDiv.addEventListener('animationend', function() {
         messageDiv.classList.remove('message-animation');
+        messageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
     });
 }
+
 
 function sendMessage() {
     var message = document.getElementById("userInput").value;
