@@ -99,5 +99,12 @@ function fetchChatLog() {
         data.forEach(message => {
             addMessageWithAnimation(chatBox, message.content, message.role === 'user');
         });
+        // メッセージが全て追加された後、チャットボックスを最下部にスクロール
+        scrollToBottom(chatBox);
     });
 }
+
+function scrollToBottom(chatBox) {
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
