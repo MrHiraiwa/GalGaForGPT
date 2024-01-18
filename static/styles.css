@@ -3,8 +3,8 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  height: 94vh;
-  margin: 0 20px;
+  height: 92vh;
+  margin: 0 15px;
   padding: 10px; /* パディングを適切に設定 */
   font-size: clamp(15px, 1vw, 25px);
   background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
