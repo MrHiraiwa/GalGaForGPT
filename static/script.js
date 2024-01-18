@@ -65,11 +65,21 @@ function addBlankMessage(chatBox) {
     return blankDiv;
 }
 
+
 function setUserMessage(messageDiv, message, isUser) {
-    setTimeout(() => {
-        messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
-        messageDiv.className = 'message-animation';
-    }, 100); // 100ミリ秒後にメッセージを設定
+    let fullMessage = (isUser ? "You: " : "Bot: ") + message;
+    let i = 0;
+
+    function typeWriter() {
+        if (i < fullMessage.length) {
+            messageDiv.textContent += fullMessage.charAt(i);
+            i++;
+            setTimeout(typeWriter, 50); // 50ミリ秒の遅延で次の文字を表示
+        }
+    }
+
+    typeWriter(); // タイピング効果の開始
+    messageDiv.className = 'message-animation';
 }
 
 window.onload = function() {
