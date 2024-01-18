@@ -62,7 +62,7 @@ def webhook_handler():
     @firestore.transactional
     def update_in_transaction(transaction, doc_ref):
         encoding = tiktoken.encoding_for_model(GPT_MODEL)
-        user_doc = doc_ref.get(transaction=transaction)
+        user_doc = doc_ref.get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
