@@ -78,35 +78,39 @@ def update_in_transaction(transaction, doc_ref, user_message):
             'daily_usage': 0,
             'start_free_day': datetime.now(jst)
         }
-            
+    
+    # トークン数の計算
     total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
-        
+    
+    # 古いメッセージの削除
     while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
         user_data['messages'].pop(0)
-            
+
     # OpenAI API へのリクエスト
-    response = requests.post(
-        'https://api.openai.com/v1/chat/completions',
-        headers={'Authorization': f'Bearer {openai_api_key}'},
-        json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
-        timeout=50
-    )
+    try:
+        response = requests.post(
+            'https://api.openai.com/v1/chat/completions',
+            headers={'Authorization': f'Bearer {openai_api_key}'},
+            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
+            timeout=50
+        )
+    except requests.exceptions.RequestException as e:
+        print(f"Error with OpenAI API: {e}")
+        return jsonify({"error": "OpenAI API request failed"}), 500
 
     if response.status_code == 200:
         response_json = response.json()
         bot_reply = response_json['choices'][0]['message']['content'].strip()
-
-        # ユーザーとボットのメッセージをFirestoreに保存
         user_data['messages'].append({'role': 'user', 'content': user_message})
         user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
         user_data['daily_usage'] += 1
         user_data['updated_date_string'] = nowDate
         doc_ref.set(user_data, merge=True)
-
         return jsonify({"reply": bot_reply})
     else:
         print(f"Error with OpenAI API: {response.text}")
         return jsonify({"error": "Unable to process your request"}), 500
+
 
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
