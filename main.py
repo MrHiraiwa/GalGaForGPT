@@ -107,7 +107,7 @@ def update_in_transaction(transaction, doc_ref, user_message):
     else:
         print(f"Error with OpenAI API: {response.text}")
         return jsonify({"error": "Unable to process your request"}), 500
-return update_in_transaction(db.transaction(), doc_ref)
+    return update_in_transaction(db.transaction(), doc_ref)
 
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
