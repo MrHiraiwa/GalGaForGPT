@@ -21,6 +21,7 @@ function addMessageWithAnimation(chatBox, message, isUser) {
 
 
 function sendMessage() {
+    document.getElementById("userInput").disabled = true;
     var message = document.getElementById("userInput").value;
     if (!message.trim()) {
         return;
@@ -33,7 +34,6 @@ function sendMessage() {
 
     // 入力フィールドを直ちにクリア
     document.getElementById("userInput").value = '';
-    document.getElementById("userInput").disabled = true;
     // ユーザーIDの確認とメッセージデータの準備
     var postData = { message: message };
     if (userId !== null) {
@@ -55,6 +55,7 @@ function sendMessage() {
         userMessageDiv.scrollIntoView({ behavior: 'smooth' }); // スムーズスクロール
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
     });
+    document.getElementById("userInput").disabled = false; // 入力ボックスを再び有効化
 }
 
 
@@ -69,7 +70,6 @@ function addBlankMessage(chatBox) {
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = (isUser ? "You: " : "Bot: ") + message;
     let i = 0;
-    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
 
     function typeWriter() {
         if (i < fullMessage.length) {
@@ -77,9 +77,7 @@ function setUserMessage(messageDiv, message, isUser) {
             i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' });
             setTimeout(typeWriter, 50);
-        } else {
-            document.getElementById("userInput").disabled = false; // 入力ボックスを再び有効化
-        }
+        } 
     }
 
     typeWriter();
