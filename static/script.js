@@ -54,7 +54,7 @@ function sendMessage() {
             postData.user_id = userId;
         }
 
-        fetch('/webhook', {
+        fetch('/texthook', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ function sendAudioData(audioBlob) {
     formData.append("audio_data", audioBlob, "audio.webm");
     formData.append("user_id", userId);
 
-    fetch('/webhook', {
+    fetch('/audiohook', {
         method: 'POST',
         body: formData
     })
@@ -211,7 +211,7 @@ function sendAudioData(audioBlob) {
             postData.user_id = userId;
         }
 
-        fetch('/webhook', {
+        fetch('/texthook', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
