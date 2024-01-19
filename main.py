@@ -98,7 +98,8 @@ def texthook_handler():
     if isinstance(user_message, list):
         user_message = ' '.join(user_message)
     if user_message == "":
-        return
+        return jsonify({"error": "No message provided"}), 400
+
     user_message = USER_NAME + ":" + user_message
     user_id = data.get("user_id")
 
