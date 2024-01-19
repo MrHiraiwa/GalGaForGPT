@@ -110,12 +110,14 @@ def webhook_handler():
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
-            
+
         # OpenAI API へのリクエスト
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
             headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
+            json={'model': GPT_MODEL, 'messages': messages_for_api},
             timeout=50
         )
 
