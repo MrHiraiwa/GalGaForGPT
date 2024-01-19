@@ -30,9 +30,9 @@ function sendMessage() {
         return;
     }
 
-    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
-    document.getElementById("sendButton").disabled = true;
-    document.getElementById("userInput").placeholder = "処理中は入力できません"
+    document.getElementById("userInput").disabled = true; // 入力ボックスを無効化
+    document.getElementById("sendButton").disabled = true; // 送信ボタンを無効化
+    document.getElementById("userInput").placeholder = "処理中は入力できません";
 
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
@@ -63,9 +63,10 @@ function sendMessage() {
             playAudio(data.audio_url); // 音声を再生
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
-                document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+                // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+                document.getElementById("userInput").disabled = false;
                 document.getElementById("sendButton").disabled = false;
-                document.getElementById("userInput").placeholder = "ここに入力"
+                document.getElementById("userInput").placeholder = "ここに入力";
                 document.getElementById("userInput").focus();
             });
         });
@@ -103,7 +104,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
         } else {
             messageDiv.scrollIntoView({ behavior: 'smooth' });
             if (callback) {
-                callback();  // コールバック関数を実行
+                callback(); // コールバック関数を実行
             }
         }
     }
