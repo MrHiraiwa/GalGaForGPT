@@ -196,10 +196,13 @@ function sendAudioData(audioBlob) {
     })
     .then(response => response.json())
     .then(data => {
+        message = []
         // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
             var userMessageDiv = addBlankMessage(chatBox);
-            setUserMessage(userMessageDiv, data.reply, true);
+            message = data.reply
+            fullMessage = username + ": " + message;
+            setUserMessage(userMessageDiv, fullMessage, true);
         }
         
         // ボットへのリクエストを開始
