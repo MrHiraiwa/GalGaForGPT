@@ -92,7 +92,10 @@ def webhook_handler():
         return jsonify({"reply": user_message, "audio_url": public_url})
     else:
         data = request.json
-        user_message = USER_NAME + ":" + data.get("message")
+        user_message = data.get("message")
+        if user_message == "":
+            return
+        user_message = USER_NAME + ":" + user_message
         user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
