@@ -166,7 +166,10 @@ def get_chat_log():
     user_doc = doc_ref.get()
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        return jsonify(user_data['messages'])
+        messages = user_data['messages']
+        if not messages:
+            return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
+        return jsonify(messages)
     else:        
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
