@@ -9,6 +9,8 @@ from google.oauth2 import id_token
 import tiktoken
 import re
 
+from voicevox import put_audio_voicevox
+
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
 secret_key = os.getenv('SECRET_KEY')
