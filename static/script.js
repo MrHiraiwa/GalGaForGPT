@@ -6,6 +6,13 @@ function getUserIdFromCookie() {
     return userCookie ? userCookie.split('=')[1] : null;
 }
 
+function playAudio(audioUrl) {
+    if (audioUrl) {
+        var audio = new Audio(audioUrl);
+        audio.play();
+    }
+}
+
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = message;
@@ -24,6 +31,7 @@ function sendMessage() {
     }
 
     document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
+    document.getElementById("userInput").placeholder = "処理中は入力できません"
 
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
@@ -34,35 +42,38 @@ function sendMessage() {
         const username = data.username;
         const fullMessage = username + ": " + message;
 
-        setUserMessage(userMessageDiv, fullMessage, true, () => {
-            var postData = { message: message };
-            if (userId !== null) {
-                postData.user_id = userId;
-            }
+        setUserMessage(userMessageDiv, fullMessage, true); // ユーザーのメッセージを表示
 
-            // サーバーへのリクエスト
-            fetch('/webhook', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                var botMessageDiv = addBlankMessage(chatBox);
-                setUserMessage(botMessageDiv, data.reply, false, () => {
-                    document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
-                    document.getElementById("userInput").focus();
-                });
+        // ボットへのリクエストを開始
+        var postData = { message: message };
+        if (userId !== null) {
+            postData.user_id = userId;
+        }
+
+        fetch('/webhook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            playAudio(data.audio_url); // 音声を再生
+            var botMessageDiv = addBlankMessage(chatBox);
+            setUserMessage(botMessageDiv, data.reply, false, () => {
+                document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+                document.getElementById("userInput").placeholder = "ここに入力"
+                document.getElementById("userInput").focus();
             });
-            document.getElementById("userInput").value = ''; // 入力フィールドをクリア
         });
+
+        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
 
-
-function setUserMessage(messageDiv, message, isUser, callback) {
+// setUserMessage 関数のコールバック引数を削除
+function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = message;
     let i = 0;
     
@@ -72,16 +83,13 @@ function setUserMessage(messageDiv, message, isUser, callback) {
             i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' });
             setTimeout(typeWriter, 50);
-        } else {
-            if (callback) {
-                callback();  // コールバック関数を呼び出す
-            }
         }
     }
 
     typeWriter();
     messageDiv.className = 'message-animation';
 }
+
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
@@ -118,4 +126,3 @@ function fetchChatLog() {
 function scrollToBottom(chatBox) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-

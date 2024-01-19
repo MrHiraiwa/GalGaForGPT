@@ -9,6 +9,8 @@ from google.oauth2 import id_token
 import tiktoken
 import re
 
+from voicevox import put_audio_voicevox
+
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
 secret_key = os.getenv('SECRET_KEY')
@@ -24,6 +26,10 @@ SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前は
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
+BACKET_NAME = 'galgegpt'
+FILE_AGE = 1 
+VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
+VOICEVOX_STYLE_ID = 27
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -83,6 +89,7 @@ def webhook_handler():
     def update_in_transaction(transaction, doc_ref):
         encoding = tiktoken.encoding_for_model(GPT_MODEL)
         user_doc = doc_ref.get()
+        public_url = []
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
@@ -116,6 +123,7 @@ def webhook_handler():
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
+            public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
@@ -125,7 +133,7 @@ def webhook_handler():
             user_data['updated_date_string'] = nowDate
             doc_ref.set(user_data, merge=True)
 
-            return jsonify({"reply": bot_reply})
+            return jsonify({"reply": bot_reply, "audio_url": public_url})
         else:
             print(f"Error with OpenAI API: {response.text}")
             return jsonify({"error": "Unable to process your request"}), 500
