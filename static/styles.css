@@ -6,7 +6,7 @@ body {
   height: 92vh;
   margin: 0 15px;
   padding: 10px;
-  width: 97vw; /* ビューポートの幅いっぱいに設定 */
+  width: 95vw;
   font-size: clamp(15px, 1vw, 25px);
   background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
   background-size: cover;
