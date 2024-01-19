@@ -4,7 +4,6 @@ from tempfile import NamedTemporaryFile
 from google.cloud import storage
 import subprocess
 from pydub.utils import mediainfo
-import langid
 import google.auth.transport.requests
 import google.oauth2.id_token
 
