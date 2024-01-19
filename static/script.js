@@ -125,7 +125,7 @@ function addBlankMessage(chatBox) {
 }
 window.onload = function() {
     document.body.classList.add('visible');
-    document.getElementById("chatContainer").style.display = "block";
+    document.getElementById("chatBox").style.display = "block";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
