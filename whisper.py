@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 def get_audio(audio_file):
-    with NamedTemporaryFile(suffix=".wav", delete=False) as temp:
+    with NamedTemporaryFile(suffix=".webm", delete=False) as temp:
         temp.write(audio_file.read())  # ファイルの内容を一時ファイルに書き込む
         temp_filename = temp.name  # ファイル名を保存
 
