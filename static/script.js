@@ -34,7 +34,6 @@ function sendMessage() {
 
     document.getElementById("userInput").disabled = true;
     document.getElementById("sendButton").disabled = true;
-    document.getElementById("audioButton").disabled = true;
     document.getElementById("userInput").placeholder = "処理中は入力できません";
 
     var chatBox = document.getElementById("chatBox");
@@ -69,7 +68,6 @@ function sendMessage() {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
                 document.getElementById("userInput").disabled = false;
                 document.getElementById("sendButton").disabled = false;
-                document.getElementById("audioButton").disabled = false;
                 document.getElementById("userInput").placeholder = "ここに入力";
                 document.getElementById("userInput").focus();
             });
@@ -191,7 +189,6 @@ function sendAudioData(audioBlob) {
     formData.append("user_id", userId);
     document.getElementById("userInput").disabled = true;
     document.getElementById("sendButton").disabled = true;
-    document.getElementById("audioButton").disabled = true;
     document.getElementById("userInput").placeholder = "処理中は入力できません";
 
     var chatBox = document.getElementById("chatBox");
@@ -208,7 +205,6 @@ function sendAudioData(audioBlob) {
             // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
             document.getElementById("userInput").disabled = false;
             document.getElementById("sendButton").disabled = false;
-            document.getElementById("audioButton").disabled = false;
             document.getElementById("userInput").placeholder = "ここに入力";
             document.getElementById("userInput").focus();
         });
