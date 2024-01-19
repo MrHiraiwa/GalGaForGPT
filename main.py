@@ -26,6 +26,10 @@ SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前は
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
+BACKET_NAME = 'galgegpt'
+FILE_AGE = 1 
+VOICEVOX_URL = 'https://xxx.com'
+VOICEVOX_STYLE_ID = 3
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -118,6 +122,7 @@ def webhook_handler():
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
+            public_url, local_path, duration = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
