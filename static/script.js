@@ -188,7 +188,6 @@ function stopRecording() {
 function sendAudioData(audioBlob) {
     const formData = new FormData();
     formData.append("audio_data", audioBlob, "audio.webm");
-    formData.append("user_id", userId);
 
     fetch('/audiohook', {
         method: 'POST',
@@ -199,39 +198,45 @@ function sendAudioData(audioBlob) {
         message = []
         // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
-            var userMessageDiv = addBlankMessage(chatBox);
-            message = data.reply
-            fullMessage = username + ": " + message;
-            setUserMessage(userMessageDiv, fullMessage, true);
-        }
+
+            fetch('/get_username')
+            .then(response => response.json())
+            .then(data => {
+                const username = data.username;            
+                var userMessageDiv = addBlankMessage(chatBox);
+                message = data.reply
+                fullMessage = username + ": " + message;
+                setUserMessage(userMessageDiv, fullMessage, true);
+            }
         
-        // ボットへのリクエストを開始
-        var postData = { message: message };
-        if (userId !== null) {
-            postData.user_id = userId;
-        }
+            // ボットへのリクエストを開始
+            var postData = { message: message };
+            if (userId !== null) {
+                postData.user_id = userId;
+            }
 
-        fetch('/texthook', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            playAudio(data.audio_url); // 音声を再生
-            var botMessageDiv = addBlankMessage(chatBox);
-            setBotMessage(botMessageDiv, data.reply, false, () => {
-                // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
-                document.getElementById("userInput").disabled = false;
-                document.getElementById("sendButton").disabled = false;
-                document.getElementById("audioButton").disabled = false;
-                document.getElementById("userInput").placeholder = "ここに入力";
-                document.getElementById("userInput").focus();
+            fetch('/texthook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                playAudio(data.audio_url); // 音声を再生
+                var botMessageDiv = addBlankMessage(chatBox);
+                setBotMessage(botMessageDiv, data.reply, false, () => {
+                    // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+                    document.getElementById("userInput").disabled = false;
+                    document.getElementById("sendButton").disabled = false;
+                    document.getElementById("audioButton").disabled = false;
+                    document.getElementById("userInput").placeholder = "ここに入力";
+                    document.getElementById("userInput").focus();
+                });
             });
-        });
 
-        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
+            document.getElementById("userInput").value = ''; // 入力フィールドをクリア
+        }
     });
 }
