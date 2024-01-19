@@ -31,6 +31,7 @@ function sendMessage() {
     }
 
     document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
+    document.getElementById("sendButton").disabled = true;
     document.getElementById("userInput").placeholder = "処理中は入力できません"
 
     var chatBox = document.getElementById("chatBox");
@@ -63,6 +64,7 @@ function sendMessage() {
             var botMessageDiv = addBlankMessage(chatBox);
             setUserMessage(botMessageDiv, data.reply, false, () => {
                 document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+                document.getElementById("sendButton").disabled = false;
                 document.getElementById("userInput").placeholder = "ここに入力"
                 document.getElementById("userInput").focus();
             });
