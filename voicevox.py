@@ -29,10 +29,6 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     except Exception as e:
         print(f"Failed to upload file: {e}")
         raise
-        
-def convert_audio_to_m4a(input_path, output_path):
-    command = ['ffmpeg', '-i', input_path, '-c:a', 'aac', output_path]
-    result = subprocess.run(command, check=True, capture_output=True, text=True)
 
 def text_to_speech(text, bucket_name, destination_blob_name, voicevox_url, style_id):
     audience = f"{voicevox_url}/"
@@ -67,17 +63,13 @@ def text_to_speech(text, bucket_name, destination_blob_name, voicevox_url, style
             temp.flush()
 
             # Convert the WAV file to M4A
-            m4a_path = temp.name.replace(".wav", ".m4a")
-            convert_audio_to_m4a(temp.name, m4a_path)
+            wav_path = temp.name
         
-            # Get the duration of the local file before uploading
-            duration = get_duration(m4a_path)
-
-            # Upload the m4a file
-            public_url = upload_blob(bucket_name, m4a_path, destination_blob_name)
+            # Upload the wav file
+            public_url = upload_blob(bucket_name, wav_path, destination_blob_name)
         
             # Return the public url, local path of the file, and duration
-            return public_url, m4a_path, duration
+            return public_url, wav_path
     else:
         print('Error: Failed to synthesize audio.')
         return
@@ -97,16 +89,6 @@ def delete_blob(bucket_name, blob_name):
     blob = bucket.blob(blob_name)
     blob.delete()
     #print(f"Blob {blob_name} deleted.")
-    
-def get_duration(file_path):
-    info = mediainfo(file_path)
-    #print(f"mediainfo: {info}")
-    duration = info.get('duration')  # durationの値がない場合はNoneを返す
-    if duration is None:
-        print(f"No duration information found for {file_path}.")
-        return 0  # または適当なデフォルト値
-    else:
-        return int(float(duration)) * 1000  # Convert to milliseconds
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
@@ -139,6 +121,6 @@ def put_audio_voicevox(userId, response, BACKET_NAME, FILE_AGE, voicevox_url, st
         print(f"Bucket {BACKET_NAME} does not exist.")
         return 'OK'
     blob_path = f'{userId}/reply.m4a'
-    public_url, local_path, duration = text_to_speech(response, BACKET_NAME, blob_path, voicevox_url, style_id)
-    return public_url, local_path, duration
+    public_url, local_path = text_to_speech(response, BACKET_NAME, blob_path, voicevox_url, style_id)
+    return public_url, local_path
       
