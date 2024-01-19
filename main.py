@@ -133,7 +133,7 @@ def webhook_handler():
             user_data['updated_date_string'] = nowDate
             doc_ref.set(user_data, merge=True)
 
-            return jsonify({"reply": bot_reply})
+            return jsonify({"reply": bot_reply, "audio_url": public_url})
         else:
             print(f"Error with OpenAI API: {response.text}")
             return jsonify({"error": "Unable to process your request"}), 500
