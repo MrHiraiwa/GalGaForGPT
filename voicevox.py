@@ -29,6 +29,10 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     except Exception as e:
         print(f"Failed to upload file: {e}")
         raise
+        
+def convert_audio_to_mp3(input_path, output_path, bitrate="128k"):
+    command = ['ffmpeg', '-i', input_path, '-c:a', 'libmp3lame', '-b:a', bitrate, output_path]
+    result = subprocess.run(command, check=True, capture_output=True, text=True)
 
 def text_to_speech(text, bucket_name, destination_blob_name, voicevox_url, style_id):
     audience = f"{voicevox_url}/"
@@ -63,13 +67,14 @@ def text_to_speech(text, bucket_name, destination_blob_name, voicevox_url, style
             temp.flush()
 
             # Convert the WAV file to M4A
-            wav_path = temp.name
+            mp3_path = temp.name.replace(".wav", ".mp3")
+            convert_audio_to_mp3(temp.name, mp3_path)
         
-            # Upload the wav file
-            public_url = upload_blob(bucket_name, wav_path, destination_blob_name)
+            # Upload the mp3 file
+            public_url = upload_blob(bucket_name, mp3_path, destination_blob_name)
         
             # Return the public url, local path of the file, and duration
-            return public_url, wav_path
+            return public_url, mp3_path
     else:
         print('Error: Failed to synthesize audio.')
         return
@@ -119,7 +124,7 @@ def put_audio_voicevox(userId, response, BACKET_NAME, FILE_AGE, voicevox_url, st
         print(f"Bucket {BACKET_NAME} does not exist.")
         return 'OK'
     filename = str(uuid.uuid4())
-    blob_path = f'{userId}/{filename}.wav'
+    blob_path = f'{userId}/{filename}.mp3'
     public_url, local_path = text_to_speech(response, BACKET_NAME, blob_path, voicevox_url, style_id)
     return public_url, local_path
       
