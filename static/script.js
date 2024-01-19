@@ -63,10 +63,10 @@ function sendMessage() {
             var botMessageDiv = addBlankMessage(chatBox);
             setUserMessage(botMessageDiv, data.reply, false);
             });
+            document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+            document.getElementById("userInput").placeholder = "ここに入力"
+            document.getElementById("userInput").focus();
         });
-        document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
-        document.getElementById("userInput").placeholder = "ここに入力"
-        document.getElementById("userInput").focus();
         document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
