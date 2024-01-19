@@ -95,6 +95,24 @@ button:hover {
     background-color: #45a049; /* ホバー時の背景色を変更 */
 }
 
+/* 音声オン・オフ切り替えボタンのスタイル */
+#voiceToggleButton {
+    position: fixed; /* 固定位置 */
+    top: 10px; /* 上から10pxの位置 */
+    right: 10px; /* 右から10pxの位置 */
+    z-index: 1000; /* 他の要素より前面に表示 */
+    padding: 5px 10px; /* パディング */
+    background-color: #f0f0f0; /* 背景色 */
+    border: 1px solid #ccc; /* ボーダー */
+    border-radius: 5px; /* 角の丸み */
+    cursor: pointer; /* カーソルをポインターに設定 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
+}
+
+#voiceToggleButton:hover {
+    background-color: #e0e0e0; /* ホバー時の背景色 */
+}
+
 
 @keyframes fadeIn {
   from { opacity: 0; }
