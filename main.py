@@ -28,7 +28,7 @@ FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
 BACKET_NAME = 'galgegpt'
 FILE_AGE = 1 
-VOICEVOX_URL = 'https://xxx.com'
+VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 3
 
 # Flask アプリケーションの初期化
