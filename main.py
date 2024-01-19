@@ -81,16 +81,16 @@ def index():
 # Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
-    user_id = request.form.get("user_id")  # user_id は form データとして送信される
-    
+    user_message = []
+    user_id = []
     if 'audio_data' in request.files:
         audio_file = request.files['audio_data']
-        user_message = get_audio(audio_file)  # get_audio 関数は音声ファイルをテキストに変換する必要がある
+        user_message = get_audio(audio_file)
+        user_id = request.form.get('user_id')
     else:
         data = request.json
         user_message = USER_NAME + ":" + data.get("message")
-
-    user_id = data.get("user_id")
+        user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
