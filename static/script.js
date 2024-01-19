@@ -6,6 +6,13 @@ function getUserIdFromCookie() {
     return userCookie ? userCookie.split('=')[1] : null;
 }
 
+function playAudio(audioUrl) {
+    if (audioUrl) {
+        var audio = new Audio(audioUrl);
+        audio.play();
+    }
+}
+
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = message;
@@ -54,8 +61,10 @@ function sendMessage() {
                 setUserMessage(botMessageDiv, data.reply, false, () => {
                     document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
                     document.getElementById("userInput").focus();
+                    playAudio(data.audio_url); // 音声を再生
                 });
             });
+            
             document.getElementById("userInput").value = ''; // 入力フィールドをクリア
         });
     });
