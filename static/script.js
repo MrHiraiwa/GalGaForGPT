@@ -25,30 +25,38 @@ function sendMessage() {
 
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
-    setUserMessage(userMessageDiv, message, true); // ユーザーメッセージを設定
-    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
 
-    var postData = { message: message };
-    if (userId !== null) {
-        postData.user_id = userId;
-    }
+    fetch('/get_username')
+    .then(response => response.json())
+    .then(data => {
+        const username = data.username;
+        const fullMessage = username + ": " + message;
 
-    // サーバーへのリクエスト
-    fetch('/webhook', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postData)
+        setUserMessage(userMessageDiv, fullMessage, true); // ユーザーメッセージを設定
+
+        var postData = { message: message };
+        if (userId !== null) {
+            postData.user_id = userId;
+        }
+
+        // サーバーへのリクエスト
+        return fetch('/webhook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        });
     })
     .then(response => response.json())
     .then(data => {
         var botMessageDiv = addBlankMessage(chatBox);
         setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
+        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
+        document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
     });
-
-    document.getElementById("userInput").value = ''; // 入力フィールドをクリア
 }
+
 
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = message;
@@ -70,7 +78,6 @@ function setUserMessage(messageDiv, message, isUser) {
     typeWriter();
     messageDiv.className = 'message-animation';
 }
-
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
