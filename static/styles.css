@@ -70,7 +70,7 @@ body.fadeout {
 button {
     background-color: #4CAF50; /* 緑色の背景 */
     color: white; /* 白色のテキスト */
-    padding: 5px 5px; /* パディング */
+    padding: 2px 5px; /* パディング */
     text-align: center; /* テキストの中央揃え */
     text-decoration: none; /* テキストの装飾を無効化 */
     display: inline-block; /* インラインブロック要素として表示 */
