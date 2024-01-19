@@ -84,9 +84,12 @@ def webhook_handler():
     user_message = []
     user_id = []
     if 'audio_data' in request.files:
+        print("1")
         audio_file = request.files['audio_data']
         user_message = get_audio(audio_file)
+        print(f"user_message: {user_message}")
         user_id = request.form.get('user_id')
+        print(f"user_id: {user_id}")
     else:
         data = request.json
         user_message = USER_NAME + ":" + data.get("message")
