@@ -1,6 +1,6 @@
 let userId = window.preloadedUserId; // サーバーサイドから提供されるユーザーID
-let mediaRecorder;
-let audioChunks = [];
+let recorder, stream;
+let chunks = [];
 
 function getUserIdFromCookie() {
     const cookies = document.cookie.split('; ');
@@ -151,38 +151,47 @@ function scrollToBottom(chatBox) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function startRecording(stream) {
-    mediaRecorder = new MediaRecorder(stream);
-    mediaRecorder.start();
+function buttonDown() {
+  document.getElementById('recordButton').classList.add('pressed');
+  startRecording();
+}
 
-    mediaRecorder.ondataavailable = function(event) {
-        audioChunks.push(event.data);
-    };
+function buttonUp() {
+  document.getElementById('recordButton').classList.remove('pressed');
+  stopRecording();
+}
 
-    mediaRecorder.onstop = function() {
-        const audioBlob = new Blob(audioChunks);
-        audioChunks = [];
-        sendAudioData(audioBlob);
-    };
+async function startRecording() {
+  chunks = [];
+  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+    recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    recorder.start();
+    recorder.ondataavailable = e => chunks.push(e.data);
+  } else {
+    console.error('audio/webm;codecs=opus is not Supported');
+  }
+}
+
+function stopRecording() {
+  recorder.stop();
+  recorder.onstop = async () => {
+    let blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+    sendAudioData(blob); // この関数でサーバーにデータを送信
+  };
+  document.querySelector("#recordButton").disabled = true;
+  document.querySelector("#recordButton").style.pointerEvents = "none";
 }
 
 function sendAudioData(audioBlob) {
     const formData = new FormData();
-    formData.append("audio_data", audioBlob);
+    formData.append("audio_data", audioBlob, "audio.webm"); // ファイル名を指定
 
     fetch('/webhook', {
         method: 'POST',
-        body: formData
+        body: formData // Content-Type は自動的に multipart/form-data に設定される
     }).then(response => response.json()).then(data => {
+        // サーバーからの応答を処理
         console.log(data);
-        // ここでサーバーからの応答を処理
     });
 }
-
-navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
-        document.getElementById("voiceButton").addEventListener("mousedown", () => startRecording(stream));
-        document.getElementById("voiceButton").addEventListener("mouseup", () => mediaRecorder.stop());
-    })
-    .catch(error => console.error(error));
-
