@@ -10,6 +10,7 @@ import tiktoken
 import re
 
 from voicevox import put_audio_voicevox
+from whisper import get_audio
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
