@@ -185,6 +185,8 @@ function stopRecording() {
   document.querySelector("#audioButton").style.pointerEvents = "none";
 }
 
+let message = ""; // この変数を関数の外で宣言
+
 function sendAudioData(audioBlob) {
     const formData = new FormData();
     formData.append("audio_data", audioBlob, "audio.webm");
@@ -197,19 +199,18 @@ function sendAudioData(audioBlob) {
     .then(data => {
         // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
-
             fetch('/get_username')
             .then(response => response.json())
             .then(data => {
-                const username = data.username;            
+                const username = data.username;
                 var userMessageDiv = addBlankMessage(chatBox);
-                const message = data.reply
-                fullMessage = username + ": " + message;
+                message = data.reply; // この行でmessage変数を更新
+                const fullMessage = username + ": " + message;
                 setUserMessage(userMessageDiv, fullMessage, true);
-            })
-        
+            });
+
             // ボットへのリクエストを開始
-            var postData = { message: message };
+            var postData = { message: message }; // ここでmessage変数を使用
             if (userId !== null) {
                 postData.user_id = userId;
             }
