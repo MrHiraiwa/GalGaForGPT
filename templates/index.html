@@ -17,7 +17,7 @@
         <div class="input-area">
             <input type="text" id="userInput" placeholder="ここに入力">
             <button id="sendButton" onclick="sendMessage()">文字</button>
-            <button id="recordButton" onmousedown="buttonDown()" onmouseup="buttonUp()" ontouchstart="buttonDown()" ontouchend="buttonUp()">音声</button>
+            <button id="audioButton" onmousedown="buttonDown()" onmouseup="buttonUp()" ontouchstart="buttonDown()" ontouchend="buttonUp()">音声</button>
         </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
