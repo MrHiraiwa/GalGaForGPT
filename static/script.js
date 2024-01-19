@@ -95,16 +95,13 @@ function setUserMessage(messageDiv, message, isUser) {
 function setBotMessage(messageDiv, message, isUser, callback) {
     let fullMessage = message;
     let i = 0;
-    
+
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            setTimeout(typeWriter, 50);
-        } else {
             messageDiv.scrollIntoView({ behavior: 'smooth' });
-            if (callback) {
-                callback(); // コールバック関数を実行
+            setTimeout(typeWriter, 50); // 各文字の表示間隔を設定
             }
         }
     }
@@ -112,6 +109,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     typeWriter();
     messageDiv.className = 'message-animation';
 }
+
 
 
 function addBlankMessage(chatBox) {
