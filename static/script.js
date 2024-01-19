@@ -207,7 +207,7 @@ function sendAudioData(audioBlob) {
                 message = data.reply
                 fullMessage = username + ": " + message;
                 setUserMessage(userMessageDiv, fullMessage, true);
-            }
+            })
         
             // ボットへのリクエストを開始
             var postData = { message: message };
