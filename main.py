@@ -93,6 +93,8 @@ def webhook_handler():
     else:
         data = request.json
         user_message = data.get("message")
+        if isinstance(user_message, list):
+            user_message = ' '.join(user_message)
         if user_message == "":
             return
         user_message = USER_NAME + ":" + user_message
