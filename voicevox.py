@@ -5,6 +5,7 @@ from google.cloud import storage
 import subprocess
 import google.auth.transport.requests
 import google.oauth2.id_token
+import uuid
 
 def get_google_cloud_token(audience):
     auth_req = google.auth.transport.requests.Request()
@@ -111,15 +112,14 @@ def bucket_exists(bucket_name):
 
     return bucket.exists()
 
-
-
 def put_audio_voicevox(userId, response, BACKET_NAME, FILE_AGE, voicevox_url, style_id):
     if bucket_exists(BACKET_NAME):
         set_bucket_lifecycle(BACKET_NAME, FILE_AGE)
     else:
         print(f"Bucket {BACKET_NAME} does not exist.")
         return 'OK'
-    blob_path = f'{userId}/reply.wav'
+    filename = str(uuid.uuid4())
+    blob_path = f'{userId}/{filename}.wav'
     public_url, local_path = text_to_speech(response, BACKET_NAME, blob_path, voicevox_url, style_id)
     return public_url, local_path
       
