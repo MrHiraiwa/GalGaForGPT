@@ -154,12 +154,12 @@ function scrollToBottom(chatBox) {
 }
 
 function buttonDown() {
-  document.getElementById('recordButton').classList.add('pressed');
+  document.getElementById('audioButton').classList.add('pressed');
   startRecording();
 }
 
 function buttonUp() {
-  document.getElementById('recordButton').classList.remove('pressed');
+  document.getElementById('audioButton').classList.remove('pressed');
   stopRecording();
 }
 
@@ -181,8 +181,8 @@ function stopRecording() {
     let blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
     sendAudioData(blob); // この関数でサーバーにデータを送信
   };
-  document.querySelector("#recordButton").disabled = true;
-  document.querySelector("#recordButton").style.pointerEvents = "none";
+  document.querySelector("#audioButton").disabled = true;
+  document.querySelector("#audioButton").style.pointerEvents = "none";
 }
 
 function sendAudioData(audioBlob) {
