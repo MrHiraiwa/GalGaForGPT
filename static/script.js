@@ -99,9 +99,9 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
-            i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' });
-            setTimeout(typeWriter, 50); // 各文字の表示間隔を設定
+            i++;
+            setTimeout(typeWriter, 50);
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
@@ -112,6 +112,8 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     typeWriter();
     messageDiv.className = 'message-animation';
 }
+
+
 
 
 
