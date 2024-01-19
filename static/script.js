@@ -254,7 +254,6 @@ function sendAudioData(audioBlob) {
                     document.getElementById("sendButton").disabled = false;
                     document.getElementById("audioButton").disabled = false;
                     document.getElementById("userInput").placeholder = "ここに入力";
-                    document.getElementById("userInput").focus();
                 });
             });
 
