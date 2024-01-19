@@ -44,6 +44,23 @@ def validate_iap_jwt(iap_jwt, expected_audience):
     except Exception as e:
         return (DEFAULT_USER_ID, None, '**ERROR: JWT validation error {}**'.format(e))
 
+def response_filter(response,bot_name,display_name):
+    date_pattern = r"^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} [A-Z]{3,4}"
+    response = re.sub(date_pattern, "", response).strip()
+    name_pattern1 = r"^"+ bot_name + ":"
+    response = re.sub(name_pattern1, "", response).strip()
+    name_pattern2 = r"^"+ bot_name + "："
+    response = re.sub(name_pattern2, "", response).strip()
+    name_pattern3 = r"^"+ display_name + ":"
+    response = re.sub(name_pattern3, "", response).strip()
+    name_pattern4 = r"^"+ display_name + "："
+    response = re.sub(name_pattern4, "", response).strip()
+    dot_pattern = r"^、"
+    response = re.sub(dot_pattern, "", response).strip()
+    dot_pattern = r"^ "
+    response = re.sub(dot_pattern, "", response).strip()
+    return response
+
 @app.route('/', methods=['GET'])
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
@@ -96,7 +113,10 @@ def webhook_handler():
 
         if response.status_code == 200:
             response_json = response.json()
-            bot_reply = BOT_NAME + ":" + response_json['choices'][0]['message']['content'].strip()
+            
+            bot_reply = response_json['choices'][0]['message']['content'].strip()
+            bot_reply = response_filter(bot_reply, bot_name, display_name)
+            bot_reply =  BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
             user_data['messages'].append({'role': 'user', 'content': user_message})
