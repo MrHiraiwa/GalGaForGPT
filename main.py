@@ -86,7 +86,7 @@ def audiohook_handler():
     user_message = get_audio(audio_file)
     print(f"user_message_v:{user_message}")
     user_id = request.form.get('user_id')
-    return jsonify({"reply": user_message)
+    return jsonify({"reply": user_message})
 
 # Texthook ハンドラ
 @app.route("/texthook", methods=["POST"])
