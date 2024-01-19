@@ -195,7 +195,6 @@ function sendAudioData(audioBlob) {
     })
     .then(response => response.json())
     .then(data => {
-        message = []
         // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
 
@@ -204,7 +203,7 @@ function sendAudioData(audioBlob) {
             .then(data => {
                 const username = data.username;            
                 var userMessageDiv = addBlankMessage(chatBox);
-                message = data.reply
+                const message = data.reply
                 fullMessage = username + ": " + message;
                 setUserMessage(userMessageDiv, fullMessage, true);
             })
