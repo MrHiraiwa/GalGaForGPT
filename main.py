@@ -17,7 +17,9 @@ nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
 YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアントID
 DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
 GPT_MODEL = 'gpt-3.5-turbo'
-SYSTEM_PROMPT = '私は有能な秘書です。'
+BOT_NAME = 'さくら'
+USER_NAME = 'USER'
+SYSTEM_PROMPT = 'あなたは有能な女性秘書です。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
@@ -54,7 +56,7 @@ def index():
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
     data = request.json
-    user_message = data.get("message")
+    user_message = USER_NAME + ":" + data.get("message")
     user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
@@ -94,7 +96,7 @@ def webhook_handler():
 
         if response.status_code == 200:
             response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+            bot_reply = BOT_NAME + ":" + response_json['choices'][0]['message']['content'].strip()
 
             # ユーザーとボットのメッセージをFirestoreに保存
             user_data['messages'].append({'role': 'user', 'content': user_message})
