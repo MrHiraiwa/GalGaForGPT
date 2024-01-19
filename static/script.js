@@ -199,12 +199,12 @@ function sendAudioData(audioBlob) {
     .then(data => {
         // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
+            message = data.reply;
             fetch('/get_username')
             .then(response => response.json())
             .then(data => {
                 const username = data.username;
                 var userMessageDiv = addBlankMessage(chatBox);
-                message = data.reply; // この行でmessage変数を更新
                 const fullMessage = username + ": " + message;
                 setUserMessage(userMessageDiv, fullMessage, true);
             });
