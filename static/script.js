@@ -8,7 +8,7 @@ function getUserIdFromCookie() {
 
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
-    messageDiv.textContent = (isUser ? "You: " : "Bot: ") + message;
+    messageDiv.textContent = message;
     messageDiv.className = 'message-animation';
     chatBox.appendChild(messageDiv);
 
@@ -51,7 +51,7 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let fullMessage = (isUser ? "You: " : "Bot: ") + message;
+    let fullMessage = message;
     let i = 0;
     
     function typeWriter() {
