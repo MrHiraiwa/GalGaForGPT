@@ -81,7 +81,12 @@ def index():
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
     data = request.json
-    user_message = USER_NAME + ":" + data.get("message")
+    
+    if 'audio_data' in data:
+        user_message = get_audio(data['audio_data'])
+    else:
+        user_message = USER_NAME + ":" + data.get("message")
+
     user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
