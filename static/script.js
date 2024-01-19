@@ -1,4 +1,6 @@
 let userId = window.preloadedUserId; // サーバーサイドから提供されるユーザーID
+let recorder, stream;
+let chunks = [];
 
 function getUserIdFromCookie() {
     const cookies = document.cookie.split('; ');
@@ -30,9 +32,10 @@ function sendMessage() {
         return;
     }
 
-    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
+    document.getElementById("userInput").disabled = true;
     document.getElementById("sendButton").disabled = true;
-    document.getElementById("userInput").placeholder = "処理中は入力できません"
+    document.getElementById("audioButton").disabled = true;
+    document.getElementById("userInput").placeholder = "処理中は入力できません";
 
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
@@ -62,10 +65,12 @@ function sendMessage() {
         .then(data => {
             playAudio(data.audio_url); // 音声を再生
             var botMessageDiv = addBlankMessage(chatBox);
-            setUserMessage(botMessageDiv, data.reply, false, () => {
-                document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+            setBotMessage(botMessageDiv, data.reply, false, () => {
+                // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+                document.getElementById("userInput").disabled = false;
                 document.getElementById("sendButton").disabled = false;
-                document.getElementById("userInput").placeholder = "ここに入力"
+                document.getElementById("audioButton").disabled = false;
+                document.getElementById("userInput").placeholder = "ここに入力";
                 document.getElementById("userInput").focus();
             });
         });
@@ -74,7 +79,6 @@ function sendMessage() {
     });
 }
 
-// setUserMessage 関数のコールバック引数を削除
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = message;
     let i = 0;
@@ -92,6 +96,26 @@ function setUserMessage(messageDiv, message, isUser) {
     messageDiv.className = 'message-animation';
 }
 
+function setBotMessage(messageDiv, message, isUser, callback) {
+    let fullMessage = message;
+    let i = 0;
+
+    function typeWriter() {
+        if (i < fullMessage.length) {
+            messageDiv.textContent += fullMessage.charAt(i);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            i++;
+            setTimeout(typeWriter, 50);
+        } else {
+            if (callback) {
+                callback(); // コールバック関数を実行
+            }
+        }
+    }
+
+    typeWriter();
+    messageDiv.className = 'message-animation';
+}
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
@@ -128,3 +152,72 @@ function fetchChatLog() {
 function scrollToBottom(chatBox) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+function buttonDown() {
+  document.getElementById('audioButton').classList.add('pressed');
+  startRecording();
+}
+
+function buttonUp() {
+  document.getElementById('audioButton').classList.remove('pressed');
+  stopRecording();
+}
+
+async function startRecording() {
+  chunks = [];
+  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+    recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    recorder.start();
+    recorder.ondataavailable = e => chunks.push(e.data);
+  } else {
+    console.error('audio/webm;codecs=opus is not Supported');
+  }
+}
+
+function stopRecording() {
+  recorder.stop();
+  recorder.onstop = async () => {
+    let blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+    sendAudioData(blob); // この関数でサーバーにデータを送信
+  };
+  document.querySelector("#audioButton").disabled = true;
+  document.querySelector("#audioButton").style.pointerEvents = "none";
+}
+
+function sendAudioData(audioBlob) {
+    const formData = new FormData();
+    formData.append("audio_data", audioBlob, "audio.webm");
+    formData.append("user_id", userId);
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendButton").disabled = true;
+    document.getElementById("audioButton").disabled = true;
+    document.getElementById("userInput").placeholder = "処理中は入力できません";
+
+    var chatBox = document.getElementById("chatBox");
+
+    fetch('/webhook', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        playAudio(data.audio_url); // 音声を再生
+        var botMessageDiv = addBlankMessage(chatBox);
+        setBotMessage(botMessageDiv, data.reply, false, () => {
+            // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+            document.getElementById("userInput").disabled = false;
+            document.getElementById("sendButton").disabled = false;
+            document.getElementById("audioButton").disabled = false;
+            document.getElementById("userInput").placeholder = "ここに入力";
+            document.getElementById("userInput").focus();
+        });
+
+        // ボットの応答をチャットボックスに表示
+        if (data.reply) {
+            var botMessageDiv = addBlankMessage(chatBox);
+            setBotMessage(botMessageDiv, data.reply, false);
+        }
+    });
+}
+

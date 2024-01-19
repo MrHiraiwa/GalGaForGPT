@@ -10,6 +10,7 @@ import tiktoken
 import re
 
 from voicevox import put_audio_voicevox
+from whisper import get_audio
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -23,6 +24,7 @@ GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
 USER_NAME = 'たろう'
 SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前はさくらです。'
+PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
@@ -76,12 +78,26 @@ def index():
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
 
+
 # Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
-    data = request.json
-    user_message = USER_NAME + ":" + data.get("message")
-    user_id = data.get("user_id")
+    user_message = []
+    user_id = []
+    if 'audio_data' in request.files:
+        print("1")
+        audio_file = request.files['audio_data']
+        user_message = USER_NAME + ":" + get_audio(audio_file)
+        print(f"user_message: {user_message}")
+        user_id = request.form.get('user_id')
+        print(f"user_id: {user_id}")
+    else:
+        print("2")
+        data = request.json
+        user_message = USER_NAME + ":" + data.get("message")
+        print(f"user_message: {user_message}")
+        user_id = data.get("user_id")
+        print(f"user_id: {user_id}")
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
@@ -110,12 +126,14 @@ def webhook_handler():
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
-            
+
         # OpenAI API へのリクエスト
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
             headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': user_message}]},
+            json={'model': GPT_MODEL, 'messages': messages_for_api},
             timeout=50
         )
 

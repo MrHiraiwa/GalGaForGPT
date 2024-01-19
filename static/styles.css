@@ -1,9 +1,13 @@
+html, body {
+  height: 100%;
+}
+
 body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: stretch;
-  height: 92vh;
+  height: 100%;
   margin: 0;
   padding: 10px;
   width: 100%;
