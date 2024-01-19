@@ -86,14 +86,17 @@ def webhook_handler():
     if 'audio_data' in request.files:
         print("1")
         audio_file = request.files['audio_data']
-        user_message = get_audio(audio_file)
+        user_message = USER_NAME + ":" + get_audio(audio_file)
         print(f"user_message: {user_message}")
         user_id = request.form.get('user_id')
         print(f"user_id: {user_id}")
     else:
+        print("2")
         data = request.json
         user_message = USER_NAME + ":" + data.get("message")
+        print(f"user_message: {user_message}")
         user_id = data.get("user_id")
+        print(f"user_id: {user_id}")
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
