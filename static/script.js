@@ -32,8 +32,9 @@ function sendMessage() {
         return;
     }
 
-    document.getElementById("userInput").disabled = true; // 入力ボックスを無効化
-    document.getElementById("sendButton").disabled = true; // 送信ボタンを無効化
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendButton").disabled = true;
+    document.getElementById("audioButton").disabled = true;
     document.getElementById("userInput").placeholder = "処理中は入力できません";
 
     var chatBox = document.getElementById("chatBox");
@@ -68,6 +69,7 @@ function sendMessage() {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
                 document.getElementById("userInput").disabled = false;
                 document.getElementById("sendButton").disabled = false;
+                document.getElementById("audioButton").disabled = false;
                 document.getElementById("userInput").placeholder = "ここに入力";
                 document.getElementById("userInput").focus();
             });
@@ -187,12 +189,35 @@ function sendAudioData(audioBlob) {
     const formData = new FormData();
     formData.append("audio_data", audioBlob, "audio.webm");
     formData.append("user_id", userId);
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendButton").disabled = true;
+    document.getElementById("audioButton").disabled = true;
+    document.getElementById("userInput").placeholder = "処理中は入力できません";
+
+    var chatBox = document.getElementById("chatBox");
 
     fetch('/webhook', {
         method: 'POST',
-        body: formData // Content-Type は自動的に multipart/form-data に設定される
-    }).then(response => response.json()).then(data => {
-        // サーバーからの応答を処理
-        console.log(data);
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        playAudio(data.audio_url); // 音声を再生
+        var botMessageDiv = addBlankMessage(chatBox);
+        setBotMessage(botMessageDiv, data.reply, false, () => {
+            // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+            document.getElementById("userInput").disabled = false;
+            document.getElementById("sendButton").disabled = false;
+            document.getElementById("audioButton").disabled = false;
+            document.getElementById("userInput").placeholder = "ここに入力";
+            document.getElementById("userInput").focus();
+        });
+
+        // ボットの応答をチャットボックスに表示
+        if (data.reply) {
+            var botMessageDiv = addBlankMessage(chatBox);
+            setBotMessage(botMessageDiv, data.reply, false);
+        }
     });
 }
+
