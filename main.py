@@ -77,14 +77,17 @@ def index():
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
 
+
 # Webhook ハンドラ
 @app.route("/webhook", methods=["POST"])
 def webhook_handler():
-    data = request.json
+    user_id = request.form.get("user_id")  # user_id は form データとして送信される
     
-    if 'audio_data' in data:
-        user_message = get_audio(data['audio_data'])
+    if 'audio_data' in request.files:
+        audio_file = request.files['audio_data']
+        user_message = get_audio(audio_file)  # get_audio 関数は音声ファイルをテキストに変換する必要がある
     else:
+        data = request.json
         user_message = USER_NAME + ":" + data.get("message")
 
     user_id = data.get("user_id")
