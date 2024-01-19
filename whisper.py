@@ -39,7 +39,7 @@ def speech_to_text(file_path):
         )
 
         if response.status_code == 200:
-            return response.json().get('choices')[0].get('text')  # ここはAPIのレスポンスに依存
+            return response.json().get('text')
         else:
             print(f"Failed to transcribe audio: {response.content}")
             return None
