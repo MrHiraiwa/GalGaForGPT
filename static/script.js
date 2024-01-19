@@ -18,7 +18,7 @@ document.getElementById("voiceToggleButton").addEventListener("click", function(
 
 // 音声のオン・オフ状態に応じてボタンのラベルを更新する関数
 function updateVoiceButtonLabel() {
-    const buttonLabel = voice_onoff ? "音声オフ" : "音声オン";
+    const buttonLabel = voice_onoff ? "音声オン" : "音声オフ";
     document.getElementById("voiceToggleButton").innerText = buttonLabel;
 }
 
