@@ -88,11 +88,13 @@ def webhook_handler():
         public_url = []
         audio_file = request.files['audio_data']
         user_message = get_audio(audio_file)
+        print(f"user_message_v:{user_message}")
         user_id = request.form.get('user_id')
         return jsonify({"reply": user_message, "audio_url": public_url})
     else:
         data = request.json
         user_message = data.get("message")
+        print(f"user_message_t:{user_message}")
         if isinstance(user_message, list):
             user_message = ' '.join(user_message)
         if user_message == "":
