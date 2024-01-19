@@ -185,7 +185,8 @@ function stopRecording() {
 
 function sendAudioData(audioBlob) {
     const formData = new FormData();
-    formData.append("audio_data", audioBlob, "audio.webm"); // ファイル名を指定
+    formData.append("audio_data", audioBlob, "audio.webm");
+    formData.append("user_id", userId);
 
     fetch('/webhook', {
         method: 'POST',
