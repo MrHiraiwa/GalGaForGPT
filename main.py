@@ -24,6 +24,7 @@ GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
 USER_NAME = 'たろう'
 SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前はさくらです。'
+PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
 FORGET_MESSAGE = '過去ログを消去しました。'
