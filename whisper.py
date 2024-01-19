@@ -3,14 +3,16 @@ import json
 import os
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+import uuid
 
 
 # Environment variables should be used to securely store the API keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 CHANNEL_ACCESS_TOKEN = os.getenv('CHANNEL_ACCESS_TOKEN')
 
-def get_audio(message_id):
-    url = f'https://api-data.line.me/v2/bot/message/{message_id}/content'
+def get_audio():
+    filename = str(uuid.uuid4())
+    url = f'https://api-data.line.me/v2/bot/message/{filename}/content'
 
     headers = {
         'Authorization': f'Bearer {CHANNEL_ACCESS_TOKEN}',
