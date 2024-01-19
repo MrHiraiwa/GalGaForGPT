@@ -6,15 +6,14 @@ from tempfile import NamedTemporaryFile
 
 # Environment variables should be used to securely store the API keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-CHANNEL_ACCESS_TOKEN = os.getenv('CHANNEL_ACCESS_TOKEN')
 
 def get_audio(audio_file):
-    with NamedTemporaryFile(suffix=".m4a", delete=False) as temp:
-        temp.write(audio_file)
-        temp.flush()
+    with NamedTemporaryFile(suffix=".wav", delete=False) as temp:
+        temp.write(audio_file.read())  # ファイルの内容を一時ファイルに書き込む
+        temp_filename = temp.name  # ファイル名を保存
 
-    # Call the speech_to_text function with the temporary file
-    return speech_to_text(temp.name)
+    # 一時ファイルを閉じてから音声認識を行う
+    return speech_to_text(temp_filename)
 
 def speech_to_text(file_path):
     with open(file_path, 'rb') as f:
@@ -40,7 +39,7 @@ def speech_to_text(file_path):
         )
 
         if response.status_code == 200:
-            return response.json().get('text')
+            return response.json().get('choices')[0].get('text')  # ここはAPIのレスポンスに依存
         else:
             print(f"Failed to transcribe audio: {response.content}")
             return None
