@@ -72,7 +72,13 @@ def webhook_handler():
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst)
             }
-            
+
+        if FORGET_KEYWORDS[0] in user_message:
+            user_data['messages'] = []
+            user_data['updated_date_string'] = nowDate
+            doc_ref.set(user_data, merge=True)
+            return jsonify({"reply": FORGET_MESSAGE})
+
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
