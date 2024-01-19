@@ -55,7 +55,7 @@ function setUserMessage(messageDiv, message, isUser) {
     .then(response => response.json())
     .then(data => {
         const username = data.username;
-        let fullMessage = (isUser ? username : 'Bot') + ": " + message;
+        let fullMessage = username + message;
         typeWriter(messageDiv, fullMessage, isUser);
     });
 }
