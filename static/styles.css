@@ -95,6 +95,18 @@ button:hover {
     background-color: #45a049; /* ホバー時の背景色を変更 */
 }
 
+#voiceToggleButton:hover {
+    background-color: #555; /* ホバー時の背景色 */
+    color: #fff;
+}
+
+#voiceToggleButton:active,
+#voiceToggleButton:focus {
+    background-color: #333; /* アクティブまたはフォーカス時の背景色 */
+    color: #fff;
+    outline: none; /* フォーカス時のアウトラインを削除 */
+}
+
 /* 音声オン・オフ切り替えボタンのスタイル */
 #voiceToggleButton {
     position: fixed; /* 固定位置 */
@@ -110,13 +122,6 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
     font-size: 16px; /* フォントサイズを調整 */
 }
-
-
-
-#voiceToggleButton:hover {
-    background-color: #e0e0e0; /* ホバー時の背景色 */
-}
-
 
 @keyframes fadeIn {
   from { opacity: 0; }
