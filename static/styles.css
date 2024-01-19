@@ -102,12 +102,16 @@ button:hover {
     right: 10px; /* 右から10pxの位置 */
     z-index: 1000; /* 他の要素より前面に表示 */
     padding: 5px 10px; /* パディング */
-    background-color: #f0f0f0; /* 背景色 */
+    background-color: #333; /* 背景色を暗い色に変更 */
+    color: #fff; /* 文字色を白に変更 */
     border: 1px solid #ccc; /* ボーダー */
     border-radius: 5px; /* 角の丸み */
     cursor: pointer; /* カーソルをポインターに設定 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    font-size: 16px; /* フォントサイズを調整 */
 }
+
+
 
 #voiceToggleButton:hover {
     background-color: #e0e0e0; /* ホバー時の背景色 */
