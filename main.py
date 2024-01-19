@@ -84,7 +84,6 @@ def audiohook_handler():
     user_id = []
     audio_file = request.files['audio_data']
     user_message = get_audio(audio_file)
-    print(f"user_message_v:{user_message}")
     return jsonify({"reply": user_message})
 
 # Texthook ハンドラ
@@ -94,7 +93,6 @@ def texthook_handler():
     user_id = []
     data = request.json
     user_message = data.get("message")
-    print(f"user_message_t:{user_message}")
     if isinstance(user_message, list):
         user_message = ' '.join(user_message)
     if user_message == "":
