@@ -61,13 +61,12 @@ function sendMessage() {
         .then(data => {
             playAudio(data.audio_url); // 音声を再生
             var botMessageDiv = addBlankMessage(chatBox);
-            setUserMessage(botMessageDiv, data.reply, false, () => {
-                document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
-                document.getElementById("userInput").placeholder = "ここに入力"
-                document.getElementById("userInput").focus();
+            setUserMessage(botMessageDiv, data.reply, false);
             });
         });
-
+        document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+        document.getElementById("userInput").placeholder = "ここに入力"
+        document.getElementById("userInput").focus();
         document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
