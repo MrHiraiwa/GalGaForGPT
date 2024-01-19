@@ -51,25 +51,32 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let fullMessage = message;
+    fetch('/get_username')
+    .then(response => response.json())
+    .then(data => {
+        const username = data.username;
+        let fullMessage = (isUser ? username : 'Bot') + ": " + message;
+        typeWriter(messageDiv, fullMessage, isUser);
+    });
+}
+
+function typeWriter(messageDiv, fullMessage, isUser) {
     let i = 0;
-    
-    function typeWriter() {
+    function typeWriterStep() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
-            setTimeout(typeWriter, 50);
+            setTimeout(typeWriterStep, 50);
         } else if (!isUser) {
             document.getElementById("userInput").disabled = false; // ボットメッセージのアニメーションが終わったら入力ボックスを有効化
             document.getElementById("userInput").focus(); // 入力ボックスにフォーカスを設定
-
         }
     }
-
-    typeWriter();
+    typeWriterStep();
     messageDiv.className = 'message-animation';
 }
+
 
 
 function addBlankMessage(chatBox) {
