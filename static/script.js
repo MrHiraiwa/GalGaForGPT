@@ -91,7 +91,7 @@ function setUserMessage(messageDiv, message, isUser) {
     messageDiv.className = 'message-animation';
 }
 
-function setBotMessage(messageDiv, message, isUser) {
+function setBotMessage(messageDiv, message, isUser, callback) {
     let fullMessage = message;
     let i = 0;
     
@@ -99,8 +99,12 @@ function setBotMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
             setTimeout(typeWriter, 50);
+        } else {
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            if (callback) {
+                callback();  // コールバック関数を実行
+            }
         }
     }
 
