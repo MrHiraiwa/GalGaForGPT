@@ -91,6 +91,12 @@ button:hover {
     background-color: #45a049; /* ホバー時の背景色を変更 */
 }
 
+#audioButton {
+    user-select: none;
+    -webkit-user-select: none; /* Safari用 */
+    -moz-user-select: none;    /* Firefox用 */
+    -ms-user-select: none;     /* IE/Edge用 */
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
