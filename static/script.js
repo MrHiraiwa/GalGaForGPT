@@ -67,7 +67,7 @@ function sendMessage() {
         if (userId !== null) {
             postData.user_id = userId;
         }
-        postData.voice_onoff = "";
+        postData.voice_onoff = voice_onoff;
 
         fetch('/texthook', {
             method: 'POST',
@@ -231,7 +231,7 @@ function sendAudioData(audioBlob) {
             if (userId !== null) {
                 postData.user_id = userId;
             }
-            postData.voice_onoff = "";
+            postData.voice_onoff = voice_onoff;
 
             fetch('/texthook', {
                 method: 'POST',
