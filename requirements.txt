@@ -2,6 +2,7 @@ flask
 gunicorn
 google-cloud-firestore
 google-api-python-client
+google-cloud-storage
 line-bot-sdk
 tiktoken
 pytz
