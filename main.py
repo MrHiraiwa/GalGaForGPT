@@ -130,7 +130,7 @@ def texthook_handler():
             user_data['messages'].pop(0)
 
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
@@ -167,8 +167,8 @@ def get_chat_log():
     if user_doc.exists:
         user_data = user_doc.to_dict()
         return jsonify(user_data['messages'])
-    else:
-        return jsonify([])
+    else:        
+        return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
 @app.route('/get_username', methods=['GET'])
 def get_username():    
