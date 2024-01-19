@@ -7,6 +7,7 @@ from google.cloud import firestore
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 import tiktoken
+import re
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
