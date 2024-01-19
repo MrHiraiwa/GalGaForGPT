@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ギャルゲーGPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <!-- ユーザーIDを事前に読み込む -->
+    <script>
+        window.preloadedUserId = "{{ user_id }}";
+    </script>
+</head>
+<body class="visible">
+    <div id="chatContainer">
+        <div id="chatBox"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="ここに入力">
+            <button onclick="sendMessage()">文字</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

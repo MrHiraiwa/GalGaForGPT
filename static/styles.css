@@ -1,0 +1,94 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  height: 92vh;
+  margin: 0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: clamp(15px, 1vw, 25px);
+  background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 2s ease-in-out, opacity 2s ease-in-out;
+  opacity: 0;
+}
+
+body.visible {
+  opacity: 1;
+}
+
+body.fadeout {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+#chatBox {
+  margin: 10px 0;
+  min-height: calc(6 * 1.2em * 1.5);
+  max-height: calc(4 * 1.2em * 1.5);
+  width: 100%;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  padding: 5px;
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+#userInput[type="text"] {
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid #ccc;
+  padding: 5px;
+  outline: none;
+  width: 100%;
+  height: 40px;
+  transition: background-color 0.3s;
+}
+
+#userInput[type="text"]:focus {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.message-animation {
+  animation: fadeIn 0.5s;
+}
+
+.input-area {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px; /* マージンを元に戻す */
+}
+
+.input-area button {
+    min-width: 100px;
+    margin-left: 10px;
+}
+
+button {
+    background-color: #4CAF50; /* 緑色の背景 */
+    color: white; /* 白色のテキスト */
+    padding: 2px 5px; /* パディング */
+    text-align: center; /* テキストの中央揃え */
+    text-decoration: none; /* テキストの装飾を無効化 */
+    display: inline-block; /* インラインブロック要素として表示 */
+    font-size: 16px; /* フォントサイズ */
+    margin: 4px 2px; /* マージン */
+    cursor: pointer; /* カーソルをポインターに設定 */
+    border: 2px solid #4CAF50; /* 緑色のボーダー */
+    border-radius: 8px; /* 角の丸み */
+    box-shadow: 2px 2px 5px grey; /* 影を追加 */
+}
+
+button:hover {
+    background-color: #45a049; /* ホバー時の背景色を変更 */
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

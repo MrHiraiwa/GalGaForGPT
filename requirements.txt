@@ -1,0 +1,9 @@
+flask
+gunicorn
+google-cloud-firestore
+google-api-python-client
+line-bot-sdk
+tiktoken
+pytz
+requests
+pycryptodome
