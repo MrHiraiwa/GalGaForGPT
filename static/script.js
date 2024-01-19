@@ -197,9 +197,9 @@ function sendAudioData(audioBlob) {
     .then(response => response.json())
     .then(data => {
         // ユーザーの音声入力をチャットボックスに表示
-        if (data.text) {
+        if (data.reply) {
             var userMessageDiv = addBlankMessage(chatBox);
-            setUserMessage(userMessageDiv, data.text, true);
+            setUserMessage(userMessageDiv, data.reply, true);
         }
         
         // ボットの応答をチャットボックスに表示
