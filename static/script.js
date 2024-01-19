@@ -78,7 +78,7 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(data => {
-            if (voice_onoff == true){
+            if (voice_onoff){
                 playAudio(data.audio_url); // 音声を再生
             }
             var botMessageDiv = addBlankMessage(chatBox);
@@ -244,7 +244,7 @@ function sendAudioData(audioBlob) {
             })
             .then(response => response.json())
             .then(data => {
-                if (voice_onoff == true){
+                if (voice_onoff){
                     playAudio(data.audio_url); // 音声を再生
                 }
                 var botMessageDiv = addBlankMessage(chatBox);
