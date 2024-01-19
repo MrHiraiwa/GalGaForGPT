@@ -1,4 +1,6 @@
 let userId = window.preloadedUserId; // サーバーサイドから提供されるユーザーID
+let mediaRecorder;
+let audioChunks = [];
 
 function getUserIdFromCookie() {
     const cookies = document.cookie.split('; ');
@@ -113,10 +115,6 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     messageDiv.className = 'message-animation';
 }
 
-
-
-
-
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
     blankDiv.style.minHeight = '20px'; // 空白行に高さを設定
@@ -152,3 +150,39 @@ function fetchChatLog() {
 function scrollToBottom(chatBox) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+function startRecording(stream) {
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+
+    mediaRecorder.ondataavailable = function(event) {
+        audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = function() {
+        const audioBlob = new Blob(audioChunks);
+        audioChunks = [];
+        sendAudioData(audioBlob);
+    };
+}
+
+function sendAudioData(audioBlob) {
+    const formData = new FormData();
+    formData.append("audio_data", audioBlob);
+
+    fetch('/webhook', {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+        // ここでサーバーからの応答を処理
+    });
+}
+
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+        document.getElementById("voiceButton").addEventListener("mousedown", () => startRecording(stream));
+        document.getElementById("voiceButton").addEventListener("mouseup", () => mediaRecorder.stop());
+    })
+    .catch(error => console.error(error));
+
