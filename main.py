@@ -93,6 +93,7 @@ def texthook_handler():
     user_id = []
     data = request.json
     user_message = data.get("message")
+    voice_onoff = data.get("voice_onoff")
     if isinstance(user_message, list):
         user_message = ' '.join(user_message)
     if user_message == "":
@@ -108,6 +109,7 @@ def texthook_handler():
         encoding = tiktoken.encoding_for_model(GPT_MODEL)
         user_doc = doc_ref.get()
         public_url = []
+        local_path = []
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
@@ -143,7 +145,8 @@ def texthook_handler():
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
-            public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
+            if voice_onoff == true:
+                public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
