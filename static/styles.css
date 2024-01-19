@@ -1,6 +1,7 @@
 body {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: stretch; /* 子要素が幅いっぱいに広がるように変更 */
   height: 92vh;
   margin: 0 0;
