@@ -78,29 +78,30 @@ def index():
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
 
-
-# Webhook ハンドラ
-@app.route("/webhook", methods=["POST"])
-def webhook_handler():
+@app.route("/audiohook", methods=["POST"])
+def audiohook_handler():
     user_message = []
     user_id = []
-    if 'audio_data' in request.files:
-        public_url = []
-        audio_file = request.files['audio_data']
-        user_message = get_audio(audio_file)
-        print(f"user_message_v:{user_message}")
-        user_id = request.form.get('user_id')
-        return jsonify({"reply": user_message, "audio_url": public_url})
-    else:
-        data = request.json
-        user_message = data.get("message")
-        print(f"user_message_t:{user_message}")
-        if isinstance(user_message, list):
-            user_message = ' '.join(user_message)
-        if user_message == "":
-            return
-        user_message = USER_NAME + ":" + user_message
-        user_id = data.get("user_id")
+    audio_file = request.files['audio_data']
+    user_message = get_audio(audio_file)
+    print(f"user_message_v:{user_message}")
+    user_id = request.form.get('user_id')
+    return jsonify({"reply": user_message)
+
+# Texthook ハンドラ
+@app.route("/texthook", methods=["POST"])
+def texthook_handler():
+    user_message = []
+    user_id = []
+    data = request.json
+    user_message = data.get("message")
+    print(f"user_message_t:{user_message}")
+    if isinstance(user_message, list):
+        user_message = ' '.join(user_message)
+    if user_message == "":
+        return
+    user_message = USER_NAME + ":" + user_message
+    user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
