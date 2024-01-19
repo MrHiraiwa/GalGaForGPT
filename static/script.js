@@ -189,12 +189,6 @@ function sendAudioData(audioBlob) {
     const formData = new FormData();
     formData.append("audio_data", audioBlob, "audio.webm");
     formData.append("user_id", userId);
-    document.getElementById("userInput").disabled = true;
-    document.getElementById("sendButton").disabled = true;
-    document.getElementById("audioButton").disabled = true;
-    document.getElementById("userInput").placeholder = "処理中は入力できません";
-
-    var chatBox = document.getElementById("chatBox");
 
     fetch('/webhook', {
         method: 'POST',
@@ -202,22 +196,29 @@ function sendAudioData(audioBlob) {
     })
     .then(response => response.json())
     .then(data => {
-        playAudio(data.audio_url); // 音声を再生
-        var botMessageDiv = addBlankMessage(chatBox);
-        setBotMessage(botMessageDiv, data.reply, false, () => {
-            // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
-            document.getElementById("userInput").disabled = false;
-            document.getElementById("sendButton").disabled = false;
-            document.getElementById("audioButton").disabled = false;
-            document.getElementById("userInput").placeholder = "ここに入力";
-            document.getElementById("userInput").focus();
-        });
-
+        // ユーザーの音声入力をチャットボックスに表示
+        if (data.text) {
+            var userMessageDiv = addBlankMessage(chatBox);
+            setUserMessage(userMessageDiv, data.text, true);
+        }
+        
         // ボットの応答をチャットボックスに表示
         if (data.reply) {
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false);
         }
+
+        // ボットの応答を音声で再生
+        if (data.audio_url) {
+            playAudio(data.audio_url);
+        }
+
+        // 入力ボックスとボタンを再度有効化
+        document.getElementById("userInput").disabled = false;
+        document.getElementById("sendButton").disabled = false;
+        document.getElementById("audioButton").disabled = false;
+        document.getElementById("userInput").placeholder = "ここに入力";
     });
 }
+
 
