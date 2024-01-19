@@ -202,23 +202,33 @@ function sendAudioData(audioBlob) {
             setUserMessage(userMessageDiv, data.reply, true);
         }
         
-        // ボットの応答をチャットボックスに表示
-        if (data.reply) {
+        // ボットへのリクエストを開始
+        var postData = { message: message };
+        if (userId !== null) {
+            postData.user_id = userId;
+        }
+
+        fetch('/webhook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            playAudio(data.audio_url); // 音声を再生
             var botMessageDiv = addBlankMessage(chatBox);
-            setBotMessage(botMessageDiv, data.reply, false);
-        }
+            setBotMessage(botMessageDiv, data.reply, false, () => {
+                // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+                document.getElementById("userInput").disabled = false;
+                document.getElementById("sendButton").disabled = false;
+                document.getElementById("audioButton").disabled = false;
+                document.getElementById("userInput").placeholder = "ここに入力";
+                document.getElementById("userInput").focus();
+            });
+        });
 
-        // ボットの応答を音声で再生
-        if (data.audio_url) {
-            playAudio(data.audio_url);
-        }
-
-        // 入力ボックスとボタンを再度有効化
-        document.getElementById("userInput").disabled = false;
-        document.getElementById("sendButton").disabled = false;
-        document.getElementById("audioButton").disabled = false;
-        document.getElementById("userInput").placeholder = "ここに入力";
+        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
     });
 }
-
-
