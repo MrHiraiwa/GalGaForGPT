@@ -51,33 +51,25 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    fetch('/get_username')
-    .then(response => response.json())
-    .then(data => {
-        const username = data.username;
-        let fullMessage = username +　":" + message;
-        typeWriter(messageDiv, fullMessage, isUser);
-    });
-}
-
-function typeWriter(messageDiv, fullMessage, isUser) {
+    let fullMessage = message;
     let i = 0;
-    function typeWriterStep() {
+    
+    function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
-            setTimeout(typeWriterStep, 50);
+            setTimeout(typeWriter, 50);
         } else if (!isUser) {
             document.getElementById("userInput").disabled = false; // ボットメッセージのアニメーションが終わったら入力ボックスを有効化
             document.getElementById("userInput").focus(); // 入力ボックスにフォーカスを設定
+
         }
     }
-    typeWriterStep();
+
+    typeWriter();
     messageDiv.className = 'message-animation';
 }
-
-
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
