@@ -8,6 +8,20 @@ function getUserIdFromCookie() {
     return userCookie ? userCookie.split('=')[1] : null;
 }
 
+let voice_onoff = false; // 音声のオン・オフ状態を管理する変数
+
+// 音声のオン・オフを切り替えるボタンのイベントハンドラ
+document.getElementById("voiceToggleButton").addEventListener("click", function() {
+    voice_onoff = !voice_onoff; // 状態を反転
+    updateVoiceButtonLabel(); // ボタンのラベル更新
+});
+
+// 音声のオン・オフ状態に応じてボタンのラベルを更新する関数
+function updateVoiceButtonLabel() {
+    const buttonLabel = voice_onoff ? "音声オフ" : "音声オン";
+    document.getElementById("voiceToggleButton").innerText = buttonLabel;
+}
+
 function playAudio(audioUrl) {
     if (audioUrl) {
         var audio = new Audio(audioUrl);
@@ -53,6 +67,7 @@ function sendMessage() {
         if (userId !== null) {
             postData.user_id = userId;
         }
+        postData.voice_onoff = "";
 
         fetch('/texthook', {
             method: 'POST',
@@ -216,6 +231,7 @@ function sendAudioData(audioBlob) {
             if (userId !== null) {
                 postData.user_id = userId;
             }
+            postData.voice_onoff = "";
 
             fetch('/texthook', {
                 method: 'POST',
