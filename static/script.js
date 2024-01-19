@@ -181,8 +181,10 @@ function stopRecording() {
     let blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
     sendAudioData(blob); // この関数でサーバーにデータを送信
   };
-  document.querySelector("#audioButton").disabled = true;
-  document.querySelector("#audioButton").style.pointerEvents = "none";
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendButton").disabled = true;
+    document.getElementById("audioButton").disabled = true;
+    document.getElementById("userInput").placeholder = "処理中は入力できません";
 }
 
 let message = ""; // この変数を関数の外で宣言
