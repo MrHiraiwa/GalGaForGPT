@@ -78,7 +78,9 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(data => {
-            playAudio(data.audio_url); // 音声を再生
+            if (voice_onoff == true){
+                playAudio(data.audio_url); // 音声を再生
+            }
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
@@ -242,7 +244,9 @@ function sendAudioData(audioBlob) {
             })
             .then(response => response.json())
             .then(data => {
-                playAudio(data.audio_url); // 音声を再生
+                if (voice_onoff == true){
+                    playAudio(data.audio_url); // 音声を再生
+                }
                 var botMessageDiv = addBlankMessage(chatBox);
                 setBotMessage(botMessageDiv, data.reply, false, () => {
                     // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
