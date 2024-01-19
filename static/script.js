@@ -23,6 +23,8 @@ function sendMessage() {
         return;
     }
 
+    document.getElementById("userInput").disabled = true;  // 入力ボックスを無効化
+
     var chatBox = document.getElementById("chatBox");
     var userMessageDiv = addBlankMessage(chatBox);
 
@@ -32,33 +34,35 @@ function sendMessage() {
         const username = data.username;
         const fullMessage = username + ": " + message;
 
-        setUserMessage(userMessageDiv, fullMessage, true); // ユーザーメッセージを設定
+        setUserMessage(userMessageDiv, fullMessage, true, () => {
+            var postData = { message: message };
+            if (userId !== null) {
+                postData.user_id = userId;
+            }
 
-        var postData = { message: message };
-        if (userId !== null) {
-            postData.user_id = userId;
-        }
-
-        // サーバーへのリクエスト
-        return fetch('/webhook', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
+            // サーバーへのリクエスト
+            fetch('/webhook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                var botMessageDiv = addBlankMessage(chatBox);
+                setUserMessage(botMessageDiv, data.reply, false, () => {
+                    document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
+                    document.getElementById("userInput").focus();
+                });
+            });
+            document.getElementById("userInput").value = ''; // 入力フィールドをクリア
         });
-    })
-    .then(response => response.json())
-    .then(data => {
-        var botMessageDiv = addBlankMessage(chatBox);
-        setUserMessage(botMessageDiv, data.reply, false); // ボットメッセージを設定
-        document.getElementById("userInput").value = ''; // 入力フィールドをクリア
-        document.getElementById("userInput").disabled = false; // 入力ボックスを有効化
     });
 }
 
 
-function setUserMessage(messageDiv, message, isUser) {
+function setUserMessage(messageDiv, message, isUser, callback) {
     let fullMessage = message;
     let i = 0;
     
@@ -66,12 +70,12 @@ function setUserMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'smooth' }); // ここでスクロール実行
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
             setTimeout(typeWriter, 50);
-        } else if (!isUser) {
-            document.getElementById("userInput").disabled = false; // ボットメッセージのアニメーションが終わったら入力ボックスを有効化
-            document.getElementById("userInput").focus(); // 入力ボックスにフォーカスを設定
-
+        } else {
+            if (callback) {
+                callback();  // コールバック関数を呼び出す
+            }
         }
     }
 
