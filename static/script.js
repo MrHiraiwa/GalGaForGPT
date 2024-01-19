@@ -102,6 +102,9 @@ function setBotMessage(messageDiv, message, isUser, callback) {
             i++;
             messageDiv.scrollIntoView({ behavior: 'smooth' });
             setTimeout(typeWriter, 50); // 各文字の表示間隔を設定
+        } else {
+            if (callback) {
+                callback(); // コールバック関数を実行
             }
         }
     }
