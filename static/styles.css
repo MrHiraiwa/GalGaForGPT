@@ -4,7 +4,7 @@ body {
   justify-content: flex-end;
   align-items: stretch; /* 子要素が幅いっぱいに広がるように変更 */
   height: 92vh;
-  margin: 0 15px;
+  margin: 0 0;
   padding: 10px;
   width: 95vw;
   font-size: clamp(15px, 1vw, 25px);
