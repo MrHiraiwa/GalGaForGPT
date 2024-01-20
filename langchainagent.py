@@ -178,11 +178,13 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global file_age
     global public_url_original
     global GPT_MODEL
+    global username
     GPT_MODEL = gpt_model
     public_url_original = []
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
+    username= ""
     
     try:
         result = mrkl.run(question)
