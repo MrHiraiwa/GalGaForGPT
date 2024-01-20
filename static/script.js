@@ -29,6 +29,17 @@ function playAudio(audioUrl) {
     }
 }
 
+function changeBackgroundImage(img_url) {
+    document.body.style.backgroundImage = 'url(' + img_url + ')';
+    document.body.classList.add('fade-in');
+
+    // アニメーション終了後にクラスを削除する
+    document.body.addEventListener('animationend', () => {
+        document.body.classList.remove('fade-in');
+    });
+}
+
+
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = message;
@@ -83,7 +94,7 @@ function sendMessage() {
             }
             img_url = data.img_url
             if (img_url){
-                //画像を変更。
+                changeBackgroundImage(img_url);
             }
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
@@ -251,9 +262,9 @@ function sendAudioData(audioBlob) {
                 if (voice_onoff){
                     playAudio(data.audio_url); // 音声を再生
                 }
-                img_url = data.img_url
+                var img_url = data.img_url
                 if (img_url){
-                    //画像を変更。
+                    changeBackgroundImage(img_url);
                 }
                 var botMessageDiv = addBlankMessage(chatBox);
                 setBotMessage(botMessageDiv, data.reply, false, () => {
