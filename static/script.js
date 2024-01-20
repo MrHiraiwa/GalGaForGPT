@@ -170,19 +170,19 @@ window.onload = function() {
             img.onload = function() {
                 // 画像が読み込まれたら背景を設定し、他の要素を表示
                 changeBackgroundImage(img_url);
-                showChatAndOtherElements();
+                showBodyElements();
             };
             img.src = img_url; // 画像の読み込みを開始
         } else {
             // 画像がない場合、直接要素を表示
-            showChatAndOtherElements();
+            showBodyElements();
         }
     });
 };
 
-function showChatAndOtherElements() {
+function showBodyElements() {
     document.body.classList.add('visible');
-    document.getElementById("chatBox").style.display = "block";
+    document.getElementById("body").style.display = "block";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
