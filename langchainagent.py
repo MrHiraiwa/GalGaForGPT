@@ -188,7 +188,7 @@ tools = [
         description="You can set the name of the conversation partner. it is single-input tool."
     ),
 ]
-mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
+mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False)
 
 def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
     global user_id
