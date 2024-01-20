@@ -173,7 +173,7 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False)
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=None):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
     global user_id
     global bucket_name
     global file_age
