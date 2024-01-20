@@ -149,7 +149,9 @@ def texthook_handler():
         # それぞれの要素を改行コードで連結
         question = SYSTEM_PROMPT + "\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
 
-        result, public_img_url, user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE)
+        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE)
+        if i_user_name:
+            user_name = i_user_name
 
         if result:
             bot_reply = result
