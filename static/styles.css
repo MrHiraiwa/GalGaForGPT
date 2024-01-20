@@ -18,7 +18,6 @@ body {
   background-repeat: no-repeat;
   transition: background-image 2s ease-in-out, opacity 2s ease-in-out;
   opacity: 0;
-  display: none;
 }
 
 body.visible {
