@@ -12,13 +12,13 @@ from bs4 import BeautifulSoup
 from google.cloud import storage
 from PIL import Image
 import io
+import uuid
 
 public_url = []
 public_url_original = []
 public_url_preview = []
     
 user_id = []
-message_id = []
 bucket_name = []
 file_age = []
 
@@ -122,9 +122,9 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 def generate_image(prompt):
     global public_url_original
     global public_url_preview
-    
-    blob_path = f'{user_id}/{message_id}.png'
-    preview_blob_path = f'{user_id}/{message_id}_s.png'
+    filename = str(uuid.uuid4())
+    blob_path = f'{user_id}/{filename}.png'
+    preview_blob_path = f'{user_id}/{filename}_s.png'
     client = OpenAI()
     try:
         response = client.images.generate(
@@ -188,9 +188,8 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
-def langchain_agent(question, USER_ID, MESSAGE_ID, BUCKET_NAME=None, FILE_AGE=None):
+def langchain_agent(question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
     global user_id
-    global message_id
     global bucket_name
     global file_age
     global public_url_original
@@ -198,7 +197,6 @@ def langchain_agent(question, USER_ID, MESSAGE_ID, BUCKET_NAME=None, FILE_AGE=No
     public_url_original = []
     public_url_preview = []
     user_id = USER_ID
-    message_id = MESSAGE_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     
