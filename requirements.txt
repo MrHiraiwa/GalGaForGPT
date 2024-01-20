@@ -3,8 +3,13 @@ gunicorn
 google-cloud-firestore
 google-api-python-client
 google-cloud-storage
-line-bot-sdk
 tiktoken
 pytz
 requests
 pycryptodome
+langchain
+langchain-community
+beautifulsoup4
+wikipedia
+openai
+Pillow

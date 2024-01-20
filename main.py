@@ -11,6 +11,7 @@ import re
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
+from langchainagent import langchain_agent
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -78,26 +79,29 @@ def index():
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
 
-
-# Webhook ハンドラ
-@app.route("/webhook", methods=["POST"])
-def webhook_handler():
+@app.route("/audiohook", methods=["POST"])
+def audiohook_handler():
     user_message = []
     user_id = []
-    if 'audio_data' in request.files:
-        print("1")
-        audio_file = request.files['audio_data']
-        user_message = USER_NAME + ":" + get_audio(audio_file)
-        print(f"user_message: {user_message}")
-        user_id = request.form.get('user_id')
-        print(f"user_id: {user_id}")
-    else:
-        print("2")
-        data = request.json
-        user_message = USER_NAME + ":" + data.get("message")
-        print(f"user_message: {user_message}")
-        user_id = data.get("user_id")
-        print(f"user_id: {user_id}")
+    audio_file = request.files['audio_data']
+    user_message = get_audio(audio_file)
+    return jsonify({"reply": user_message})
+
+# Texthook ハンドラ
+@app.route("/texthook", methods=["POST"])
+def texthook_handler():
+    user_message = []
+    user_id = []
+    data = request.json
+    user_message = data.get("message")
+    voice_onoff = data.get("voice_onoff")
+    if isinstance(user_message, list):
+        user_message = ' '.join(user_message)
+    if user_message == "":
+        return jsonify({"error": "No message provided"}), 400
+
+    user_message = USER_NAME + ":" + user_message
+    user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
     doc_ref = db.collection(u'users').document(user_id)
@@ -106,6 +110,7 @@ def webhook_handler():
         encoding = tiktoken.encoding_for_model(GPT_MODEL)
         user_doc = doc_ref.get()
         public_url = []
+        local_path = []
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
@@ -128,7 +133,7 @@ def webhook_handler():
             user_data['messages'].pop(0)
 
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
@@ -141,7 +146,8 @@ def webhook_handler():
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
-            public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
+            if voice_onoff:
+                public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
@@ -164,9 +170,12 @@ def get_chat_log():
     user_doc = doc_ref.get()
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        return jsonify(user_data['messages'])
-    else:
-        return jsonify([])
+        messages = user_data['messages']
+        if not messages:
+            return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
+        return jsonify(messages)
+    else:        
+        return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
 @app.route('/get_username', methods=['GET'])
 def get_username():    

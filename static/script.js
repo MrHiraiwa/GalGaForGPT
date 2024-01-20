@@ -8,6 +8,20 @@ function getUserIdFromCookie() {
     return userCookie ? userCookie.split('=')[1] : null;
 }
 
+let voice_onoff = false; // 音声のオン・オフ状態を管理する変数
+
+// 音声のオン・オフを切り替えるボタンのイベントハンドラ
+document.getElementById("voiceToggleButton").addEventListener("click", function() {
+    voice_onoff = !voice_onoff; // 状態を反転
+    updateVoiceButtonLabel(); // ボタンのラベル更新
+});
+
+// 音声のオン・オフ状態に応じてボタンのラベルを更新する関数
+function updateVoiceButtonLabel() {
+    const buttonLabel = voice_onoff ? "音声オン" : "音声オフ";
+    document.getElementById("voiceToggleButton").innerText = buttonLabel;
+}
+
 function playAudio(audioUrl) {
     if (audioUrl) {
         var audio = new Audio(audioUrl);
@@ -53,8 +67,9 @@ function sendMessage() {
         if (userId !== null) {
             postData.user_id = userId;
         }
+        postData.voice_onoff = voice_onoff;
 
-        fetch('/webhook', {
+        fetch('/texthook', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -63,7 +78,9 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(data => {
-            playAudio(data.audio_url); // 音声を再生
+            if (voice_onoff){
+                playAudio(data.audio_url); // 音声を再生
+            }
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
@@ -125,7 +142,7 @@ function addBlankMessage(chatBox) {
 }
 window.onload = function() {
     document.body.classList.add('visible');
-    document.getElementById("chatContainer").style.display = "block";
+    document.getElementById("chatBox").style.display = "block";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
@@ -181,43 +198,66 @@ function stopRecording() {
     let blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
     sendAudioData(blob); // この関数でサーバーにデータを送信
   };
-  document.querySelector("#audioButton").disabled = true;
-  document.querySelector("#audioButton").style.pointerEvents = "none";
-}
-
-function sendAudioData(audioBlob) {
-    const formData = new FormData();
-    formData.append("audio_data", audioBlob, "audio.webm");
-    formData.append("user_id", userId);
     document.getElementById("userInput").disabled = true;
     document.getElementById("sendButton").disabled = true;
     document.getElementById("audioButton").disabled = true;
     document.getElementById("userInput").placeholder = "処理中は入力できません";
+}
 
-    var chatBox = document.getElementById("chatBox");
+let message = ""; // この変数を関数の外で宣言
 
-    fetch('/webhook', {
+function sendAudioData(audioBlob) {
+    const formData = new FormData();
+    formData.append("audio_data", audioBlob, "audio.webm");
+
+    fetch('/audiohook', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
-        playAudio(data.audio_url); // 音声を再生
-        var botMessageDiv = addBlankMessage(chatBox);
-        setBotMessage(botMessageDiv, data.reply, false, () => {
-            // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
-            document.getElementById("userInput").disabled = false;
-            document.getElementById("sendButton").disabled = false;
-            document.getElementById("audioButton").disabled = false;
-            document.getElementById("userInput").placeholder = "ここに入力";
-            document.getElementById("userInput").focus();
-        });
-
-        // ボットの応答をチャットボックスに表示
+        // ユーザーの音声入力をチャットボックスに表示
         if (data.reply) {
-            var botMessageDiv = addBlankMessage(chatBox);
-            setBotMessage(botMessageDiv, data.reply, false);
+            message = data.reply;
+            fetch('/get_username')
+            .then(response => response.json())
+            .then(data => {
+                const username = data.username;
+                var userMessageDiv = addBlankMessage(chatBox);
+                const fullMessage = username + ": " + message;
+                setUserMessage(userMessageDiv, fullMessage, true);
+            });
+
+            // ボットへのリクエストを開始
+            var postData = { message: message }; // ここでmessage変数を使用
+            if (userId !== null) {
+                postData.user_id = userId;
+            }
+            postData.voice_onoff = voice_onoff;
+
+            fetch('/texthook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (voice_onoff){
+                    playAudio(data.audio_url); // 音声を再生
+                }
+                var botMessageDiv = addBlankMessage(chatBox);
+                setBotMessage(botMessageDiv, data.reply, false, () => {
+                    // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
+                    document.getElementById("userInput").disabled = false;
+                    document.getElementById("sendButton").disabled = false;
+                    document.getElementById("audioButton").disabled = false;
+                    document.getElementById("userInput").placeholder = "ここに入力";
+                });
+            });
+
+            document.getElementById("userInput").value = ''; // 入力フィールドをクリア
         }
     });
 }
-

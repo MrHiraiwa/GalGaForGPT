@@ -85,12 +85,43 @@ button {
     border: 2px solid #4CAF50; /* 緑色のボーダー */
     border-radius: 8px; /* 角の丸み */
     box-shadow: 2px 2px 5px grey; /* 影を追加 */
+    user-select: none;
+    -webkit-user-select: none; /* Safari用 */
+    -moz-user-select: none;    /* Firefox用 */
+    -ms-user-select: none;     /* IE/Edge用 */
 }
 
 button:hover {
     background-color: #45a049; /* ホバー時の背景色を変更 */
 }
 
+#voiceToggleButton:hover {
+    background-color: #555; /* ホバー時の背景色 */
+    color: #fff;
+}
+
+#voiceToggleButton:active,
+#voiceToggleButton:focus {
+    background-color: #333; /* アクティブまたはフォーカス時の背景色 */
+    color: #fff;
+    outline: none; /* フォーカス時のアウトラインを削除 */
+}
+
+/* 音声オン・オフ切り替えボタンのスタイル */
+#voiceToggleButton {
+    position: fixed; /* 固定位置 */
+    top: 10px; /* 上から10pxの位置 */
+    right: 10px; /* 右から10pxの位置 */
+    z-index: 1000; /* 他の要素より前面に表示 */
+    padding: 5px 10px; /* パディング */
+    background-color: #333; /* 背景色を暗い色に変更 */
+    color: #fff; /* 文字色を白に変更 */
+    border: 1px solid #ccc; /* ボーダー */
+    border-radius: 5px; /* 角の丸み */
+    cursor: pointer; /* カーソルをポインターに設定 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    font-size: 16px; /* フォントサイズを調整 */
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
