@@ -193,32 +193,6 @@ function showChatAndOtherElements() {
     });
 }
 
-window.onload = function() {
-    // ここでuser_idを取得または設定
-    const userId = window.preloadedUserId || 'default_user_id';
-
-    // 画像生成をリクエスト
-    fetch('/generate_image?user_id=' + userId)
-    .then(response => response.json())
-    .then(data => {
-        const img_url = data.img_url;
-        if (img_url) {
-            changeBackgroundImage(img_url);
-        }
-    }); // ここで閉じる
-
-    document.body.classList.add('visible');
-    document.getElementById("chatBox").style.display = "block";
-    fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
-
-    document.getElementById("userInput").addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // フォームの自動送信を防止
-            sendMessage();
-        }
-    });
-};
-
 function fetchChatLog() {
     fetch(`/get_chat_log?user_id=${userId}`)
     .then(response => response.json())
