@@ -244,11 +244,16 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         
 @app.route('/generate_image', methods=['GET'])
 def generate_image():
+    user_id = request.args.get('user_id', DEFAULT_USER_ID)
+    bucket_name = BACKET_NAME  # または適切なバケット名を設定
+
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
-    client = OpenAI()
+    client = OpenAI(api_key=openai_api_key)  # APIキーを設定
+
     prompt = PAINT_PROMPT
-    
+
+    try:
         response = client.images.generate(
             model="dall-e-3",
             prompt=prompt,
@@ -257,22 +262,22 @@ def generate_image():
             n=1,
         )
         image_result = response.data[0].url
+
+        if bucket_exists(bucket_name):
+            set_bucket_lifecycle(bucket_name, FILE_AGE)
+        else:
+            print(f"Bucket {bucket_name} does not exist.")
+            return jsonify({"error": "Bucket does not exist"}), 400
+
+        # PNG画像をダウンロード
+        png_image = download_image(image_result)
+
+        # 元のPNG画像をアップロード
+        public_url_original = upload_blob(bucket_name, png_image, blob_path)
+        return jsonify({"img_url": public_url_original})
     except Exception as e:
-        return e
+        return jsonify({"error": str(e)}), 500
 
-    if bucket_exists(bucket_name):
-        set_bucket_lifecycle(bucket_name, file_age)
-    else:
-        print(f"Bucket {bucket_name} does not exist.")
-        return 'OK'
-
-    # PNG画像をダウンロード
-    png_image = download_image(image_result)
-
-    # 元のPNG画像をアップロード
-    public_url_original = upload_blob(bucket_name, png_image, blob_path)
-
-    return
 
 @app.route('/get_username', methods=['GET'])
 def get_username():
