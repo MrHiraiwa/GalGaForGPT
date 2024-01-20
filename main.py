@@ -122,7 +122,8 @@ def texthook_handler():
                 'start_free_day': datetime.now(jst),
                 'user_name': USER_NAME
             }
-            user_name = user_data['user_name']
+            
+        user_name = user_data['user_name']
             
         user_message = user_name + ":" + user_message
 
