@@ -1,7 +1,6 @@
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
 from langchain_community.chat_models import ChatOpenAI
-from langchain_community.utilities.google_search import GoogleSearchAPIWrapper
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from openai import OpenAI
@@ -24,11 +23,7 @@ file_age = []
 
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 
-google_search = GoogleSearchAPIWrapper()
 wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang='ja', doc_content_chars_max=1000, load_all_available_meta=True))
-
-def google_search_results(query):
-    return google_search.results(query, 5)
 
 def clock(dummy):
     jst = pytz.timezone('Asia/Tokyo')
@@ -160,11 +155,6 @@ def generate_image(prompt):
     return 'generated the image. The image you generated has already been displayed to the user. No need to send URL.'
 
 tools = [
-    Tool(
-        name = "Search",
-        func=google_search_results,
-        description="useful for when you need to answer questions about recent events. it is single-input tool Search. After searching, please refer to the page using Scraping and check the details."
-    ),
     Tool(
         name = "Clock",
         func=clock,
