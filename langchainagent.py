@@ -156,6 +156,11 @@ def generate_image(prompt):
 
     return 'generated the image. The image you generated has already been displayed to the user. No need to send URL.'
 
+def set_UserName(prompt):
+    global username
+    username = prompt
+    return
+
 tools = [
     Tool(
         name = "Clock",
@@ -177,6 +182,11 @@ tools = [
         func= generate_image,
         description="It is a useful tool that can generate image based on the Sentence by specifying the Sentence."
     ),
+    Tool(
+        name = "set_UserName",
+        func= set_username,
+        description="You can set the name of the conversation partner. it is single-input tool."
+    ),
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
@@ -196,7 +206,7 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     
     try:
         result = mrkl.run(question)
-        return result, public_url_original, public_url_preview
+        return result, public_url_original, public_url_preview, username
     except Exception as e:
         print(f"An error occurred: {e}")
         # 何らかのデフォルト値やエラーメッセージを返す
