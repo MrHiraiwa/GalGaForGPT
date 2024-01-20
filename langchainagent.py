@@ -163,7 +163,7 @@ tools = [
     Tool(
         name = "Painting",
         func= generate_image,
-        description="This is a tool that generates scenery that matches the scene when your emotions or scene change by specifying the Sentence."
+        description="If the emotion or scene changes, be sure to specify the emotion or scene in text and execute."
     ),
     Tool(
         name = "set_UserName",
