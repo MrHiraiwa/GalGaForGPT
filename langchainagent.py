@@ -9,13 +9,11 @@ import pytz
 import requests
 from bs4 import BeautifulSoup
 from google.cloud import storage
-from PIL import Image
 import io
 import uuid
 
 public_url = []
 public_url_original = []
-public_url_preview = []
     
 user_id = []
 bucket_name = []
@@ -92,15 +90,6 @@ def download_image(image_url):
     response = requests.get(image_url)
     return io.BytesIO(response.content)
 
-def create_preview_image(original_image_stream):
-    """ 画像のサイズを縮小してプレビュー用画像を生成する """
-    image = Image.open(original_image_stream)
-    image.thumbnail((640, 640))  # 画像の最大サイズを1024x1024に制限
-    preview_image = io.BytesIO()
-    image.save(preview_image, format='PNG')
-    preview_image.seek(0)
-    return preview_image
-
 def upload_blob(bucket_name, source_stream, destination_blob_name, content_type='image/png'):
     """Uploads a file to the bucket from a byte stream."""
     try:
@@ -118,7 +107,6 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 
 def generate_image(prompt):
     global public_url_original
-    global public_url_preview
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
     preview_blob_path = f'{user_id}/{filename}_s.png'
@@ -144,15 +132,9 @@ def generate_image(prompt):
     # PNG画像をダウンロード
     png_image = download_image(image_result)
 
-    # プレビュー画像を生成
-    preview_image = create_preview_image(png_image)
-    png_image.seek(0)  # ストリームをリセット
-
     # 元のPNG画像をアップロード
     public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
-    # プレビュー用のPNG画像をアップロード
-    public_url_preview = upload_blob(bucket_name, preview_image, preview_blob_path)
 
     return 'generated the image. The image you generated has already been displayed to the user. No need to send URL.'
 
@@ -195,18 +177,16 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global bucket_name
     global file_age
     global public_url_original
-    global public_url_preview
     global GPT_MODEL
     GPT_MODEL = gpt_model
     public_url_original = []
-    public_url_preview = []
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     
     try:
         result = mrkl.run(question)
-        return result, public_url_original, public_url_preview, username
+        return result, public_url_original, username
     except Exception as e:
         print(f"An error occurred: {e}")
         # 何らかのデフォルト値やエラーメッセージを返す
