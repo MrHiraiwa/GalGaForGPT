@@ -81,6 +81,9 @@ function sendMessage() {
             if (voice_onoff){
                 playAudio(data.audio_url); // 音声を再生
             }
+            if (img_url){
+                //画像を変更。
+            }
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
