@@ -137,7 +137,7 @@ def generate_image(prompt):
     public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
 
-    return 'generated the image.'
+    return
 
 def set_username(prompt):
     global username
@@ -163,7 +163,7 @@ tools = [
     Tool(
         name = "Painting",
         func= generate_image,
-        description="It is a useful tool that can generate image based on the Sentence by specifying the Sentence."
+        description="This is a tool that generates scenery that matches the scene when your emotions or scene change by specifying the Sentence."
     ),
     Tool(
         name = "set_UserName",
