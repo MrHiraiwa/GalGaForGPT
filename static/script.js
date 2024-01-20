@@ -182,7 +182,7 @@ window.onload = function() {
 
 function showBodyElements() {
     document.body.classList.add('visible');
-    document.getElementById("body").style.display = "block";
+    document.body.style.display = "block";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
