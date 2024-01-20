@@ -21,7 +21,9 @@ user_id = []
 bucket_name = []
 file_age = []
 
-llm = ChatOpenAI(model="gpt-3.5-turbo")
+GPT_MODEL = "gpt-3.5-turbo"
+
+llm = ChatOpenAI(model=GPT_MODEL)
 
 wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang='ja', doc_content_chars_max=1000, load_all_available_meta=True))
 
@@ -178,12 +180,14 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
-def langchain_agent(question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
+def langchain_agent(GPT_MODEL, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
     global user_id
     global bucket_name
     global file_age
     global public_url_original
     global public_url_preview
+    global GPT_MODEL
+    GPT_MODEL = GPT_MODEL
     public_url_original = []
     public_url_preview = []
     user_id = USER_ID
