@@ -111,7 +111,7 @@ def generate_image(prompt):
     blob_path = f'{user_id}/{filename}.png'
     preview_blob_path = f'{user_id}/{filename}_s.png'
     client = OpenAI()
-    prompt = PAINT_PROMPT + "\n" + prompt
+    prompt = paint_prompt + "\n" + prompt
     try:
         response = client.images.generate(
             model="dall-e-3",
