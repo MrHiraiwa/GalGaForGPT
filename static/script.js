@@ -36,7 +36,7 @@ function addMessageWithAnimation(chatBox, message, isUser) {
     chatBox.appendChild(messageDiv);
 
     // スムーズスクロールの実行
-    messageDiv.scrollIntoView({ behavior: 'auto' });
+    messageDiv.scrollIntoView({ behavior: 'smooth' });
 
 }
 
@@ -104,8 +104,8 @@ function setUserMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'auto' });
-            setTimeout(typeWriter, 50);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(typeWriter, 25);
         }
     }
 
@@ -120,9 +120,9 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
-            messageDiv.scrollIntoView({ behavior: 'auto' });
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
             i++;
-            setTimeout(typeWriter, 50);
+            setTimeout(typeWriter, 25);
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
