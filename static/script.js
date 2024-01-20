@@ -156,33 +156,28 @@ function addBlankMessage(chatBox) {
     return blankDiv;
 }
 
-
 window.onload = function() {
     const userId = window.preloadedUserId || 'default_user_id';
-    changeBackgroundImage("https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png");
+    document.getElementById('backgroundImage').style.backgroundImage = 'url(' + https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png + ')';
     fetch('/generate_image?user_id=' + userId)
     .then(response => response.json())
     .then(data => {
         const img_url = data.img_url;
         if (img_url) {
-            // 新しい背景画像オブジェクトを作成
             const img = new Image();
             img.onload = function() {
-                // 画像が読み込まれたら背景を設定し、他の要素を表示
-                changeBackgroundImage(img_url);
+                document.getElementById('backgroundImage').style.backgroundImage = 'url(' + img_url + ')';
                 showBodyElements();
             };
-            img.src = img_url; // 画像の読み込みを開始
+            img.src = img_url;
         } else {
-            // 画像がない場合、直接要素を表示
             showBodyElements();
         }
     });
 };
 
 function showBodyElements() {
-    document.body.classList.add('visible');
-    document.body.style.display = "block";
+    document.body.style.opacity = "1";
     fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
     document.getElementById("userInput").addEventListener('keypress', function(e) {
