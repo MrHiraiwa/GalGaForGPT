@@ -180,14 +180,14 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
-def langchain_agent(GPT_MODEL, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
     global user_id
     global bucket_name
     global file_age
     global public_url_original
     global public_url_preview
     global GPT_MODEL
-    GPT_MODEL = GPT_MODEL
+    GPT_MODEL = gpt_model
     public_url_original = []
     public_url_preview = []
     user_id = USER_ID
