@@ -41,7 +41,7 @@ app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
 # Firestore クライアントの初期化
 try:
-    db = firestore.Client(project="my-project-id")
+    db = firestore.Client()
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
