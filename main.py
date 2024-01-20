@@ -111,7 +111,7 @@ def texthook_handler():
         user_doc = doc_ref.get()
         public_url = []
         local_path = []
-        user_name　= USER_NAME
+        user_name = USER_NAME
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
