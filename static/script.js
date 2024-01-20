@@ -156,6 +156,43 @@ function addBlankMessage(chatBox) {
     return blankDiv;
 }
 
+
+window.onload = function() {
+    const userId = window.preloadedUserId || 'default_user_id';
+
+    fetch('/generate_image?user_id=' + userId)
+    .then(response => response.json())
+    .then(data => {
+        const img_url = data.img_url;
+        if (img_url) {
+            // 新しい背景画像オブジェクトを作成
+            const img = new Image();
+            img.onload = function() {
+                // 画像が読み込まれたら背景を設定し、他の要素を表示
+                changeBackgroundImage(img_url);
+                showChatAndOtherElements();
+            };
+            img.src = img_url; // 画像の読み込みを開始
+        } else {
+            // 画像がない場合、直接要素を表示
+            showChatAndOtherElements();
+        }
+    });
+};
+
+function showChatAndOtherElements() {
+    document.body.classList.add('visible');
+    document.getElementById("chatBox").style.display = "block";
+    fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
+
+    document.getElementById("userInput").addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // フォームの自動送信を防止
+            sendMessage();
+        }
+    });
+}
+
 window.onload = function() {
     // ここでuser_idを取得または設定
     const userId = window.preloadedUserId || 'default_user_id';
