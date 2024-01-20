@@ -33,6 +33,7 @@ BACKET_NAME = 'galgegpt'
 FILE_AGE = 1 
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
+COLLECTION_NAME = 'galgagpt'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -100,7 +101,6 @@ def texthook_handler():
     if user_message == "":
         return jsonify({"error": "No message provided"}), 400
 
-    user_message = USER_NAME + ":" + user_message
     user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
@@ -118,8 +118,12 @@ def texthook_handler():
                 'messages': [],
                 'updated_date_string': nowDate,
                 'daily_usage': 0,
-                'start_free_day': datetime.now(jst)
+                'start_free_day': datetime.now(jst),
+                'user_name': USER_NAME
             }
+
+        user_name = user_data['user_name']
+        user_message = user_name + ":" + user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
@@ -178,8 +182,18 @@ def get_chat_log():
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
 @app.route('/get_username', methods=['GET'])
-def get_username():    
-    return jsonify({"username": USER_NAME})
+def get_username():
+    user_id = request.args.get('user_id', DEFAULT_USER_ID) # デフォルトのユーザーIDを使用
+    doc_ref = db.collection(u'users').document(user_id)
+    user_doc = doc_ref.get()
+
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+        user_name = user_data.get('user_name', USER_NAME) # デフォルトのユーザー名を使用
+    else:
+        user_name = USER_NAME
+    
+    return jsonify({"username": user_name})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
