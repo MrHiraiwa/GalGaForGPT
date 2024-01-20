@@ -132,19 +132,19 @@ def texthook_handler():
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
 
+
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        # メッセージリストの全ての要素を文字列に変換
+        messages_str_list = [msg['content'] for msg in user_data['messages']]
 
-        response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': messages_for_api},
-            timeout=50
-        )
+        # それぞれの要素を改行コードで連結
+        question = SYSTEM_PROMPT + "\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
 
-        if response.status_code == 200:
-            response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+        result, public_img_url, public_img_url_s = langchain_agent(question, user_id, BACKET_NAME, FILE_AGE)
+
+        if result:
+            bot_reply = result
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
