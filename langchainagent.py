@@ -156,7 +156,7 @@ def generate_image(prompt):
 
     return 'generated the image. The image you generated has already been displayed to the user. No need to send URL.'
 
-def set_UserName(prompt):
+def set_username(prompt):
     global username
     username = prompt
     return
