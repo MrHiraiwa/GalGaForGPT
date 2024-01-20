@@ -123,7 +123,7 @@ def texthook_handler():
             
         user_name = user_data['user_name']
             
-        user_message = user_name + ":" + i_user_message
+        user_message = nowDateStr + " " + user_name + ":" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
