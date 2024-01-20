@@ -159,7 +159,7 @@ function addBlankMessage(chatBox) {
 
 window.onload = function() {
     const userId = window.preloadedUserId || 'default_user_id';
-
+    changeBackgroundImage("https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png");
     fetch('/generate_image?user_id=' + userId)
     .then(response => response.json())
     .then(data => {
