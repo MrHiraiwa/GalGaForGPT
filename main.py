@@ -126,7 +126,7 @@ def texthook_handler():
         if user_name is None:
             user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
         
-        user_message = nowDateStr + " " + user_name + ":" + i_user_message
+        user_message = user_name + ":" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
