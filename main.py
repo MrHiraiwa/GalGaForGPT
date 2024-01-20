@@ -4,10 +4,15 @@ import requests
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
+from google.cloud import storage
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 import tiktoken
 import re
+import uuid
+from openai import OpenAI
+import requests
+import io
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
@@ -193,6 +198,81 @@ def get_chat_log():
         return jsonify(messages)
     else:        
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
+
+
+def set_bucket_lifecycle(bucket_name, age):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+
+    rule = {
+        'action': {'type': 'Delete'},
+        'condition': {'age': age}  # The number of days after object creation
+    }
+    
+    bucket.lifecycle_rules = [rule]
+    bucket.patch()
+
+    #print(f"Lifecycle rule set for bucket {bucket_name}.")
+
+def bucket_exists(bucket_name):
+    """Check if a bucket exists."""
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    return bucket.exists()
+
+def download_image(image_url):
+    """ PNG画像をダウンロードする """
+    response = requests.get(image_url)
+    return io.BytesIO(response.content)
+
+def upload_blob(bucket_name, source_stream, destination_blob_name, content_type='image/png'):
+    """Uploads a file to the bucket from a byte stream."""
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+
+        blob.upload_from_file(source_stream, content_type=content_type)
+    
+        public_url = f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
+        return public_url
+    except Exception as e:
+        print(f"Failed to upload file: {e}")
+        raise
+        
+@app.route('/generate_image', methods=['GET'])
+def generate_image():
+    filename = str(uuid.uuid4())
+    blob_path = f'{user_id}/{filename}.png'
+    client = OpenAI()
+    prompt = PAINT_PROMPT
+    
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
+        image_result = response.data[0].url
+    except Exception as e:
+        return e
+
+    if bucket_exists(bucket_name):
+        set_bucket_lifecycle(bucket_name, file_age)
+    else:
+        print(f"Bucket {bucket_name} does not exist.")
+        return 'OK'
+
+    # PNG画像をダウンロード
+    png_image = download_image(image_result)
+
+    # 元のPNG画像をアップロード
+    public_url_original = upload_blob(bucket_name, png_image, blob_path)
+
+    return
 
 @app.route('/get_username', methods=['GET'])
 def get_username():
