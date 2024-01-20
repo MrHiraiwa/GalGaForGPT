@@ -91,14 +91,12 @@ def audiohook_handler():
 # Texthook ハンドラ
 @app.route("/texthook", methods=["POST"])
 def texthook_handler():
-    user_message = []
-    user_id = []
     data = request.json
-    user_message = data.get("message")
+    i_user_message = data.get("message")
     voice_onoff = data.get("voice_onoff")
-    if isinstance(user_message, list):
-        user_message = ' '.join(user_message)
-    if user_message == "":
+    if isinstance(i_user_message, list):
+        i_user_message = ' '.join(i_user_message)
+    if i_user_message == "":
         return jsonify({"error": "No message provided"}), 400
 
     user_id = data.get("user_id")
@@ -125,7 +123,7 @@ def texthook_handler():
             
         user_name = user_data['user_name']
             
-        user_message = user_name + ":" + user_message
+        user_message = user_name + ":" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
