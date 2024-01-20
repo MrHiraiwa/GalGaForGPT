@@ -147,7 +147,7 @@ tools = [
     Tool(
         name = "Clock",
         func=clock,
-        description="useful for when you need to know what time it is. it is single-input tool."
+        description="useful for when you need to know what time it is."
     ),
     Tool(
         name = "Scraping",
