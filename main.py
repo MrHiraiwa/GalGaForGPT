@@ -184,8 +184,11 @@ def get_chat_log():
         messages = user_data['messages']
         if not messages:
             return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
+
         date_pattern = r"^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} [A-Z]{3,4}"
-        messages = re.sub(date_pattern, "", messages).strip()
+        for message in messages:
+            message['content'] = re.sub(date_pattern, "", message['content']).strip()
+
         return jsonify(messages)
     else:        
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
