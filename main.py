@@ -33,6 +33,7 @@ BACKET_NAME = 'galgegpt'
 FILE_AGE = 1 
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
+DATABASE_NAME = 'galgagpt'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -40,7 +41,7 @@ app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
 # Firestore クライアントの初期化
 try:
-    db = firestore.Client()
+    db = firestore.Client(database=DATABASE_NAME)
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
@@ -90,17 +91,14 @@ def audiohook_handler():
 # Texthook ハンドラ
 @app.route("/texthook", methods=["POST"])
 def texthook_handler():
-    user_message = []
-    user_id = []
     data = request.json
-    user_message = data.get("message")
+    i_user_message = data.get("message")
     voice_onoff = data.get("voice_onoff")
-    if isinstance(user_message, list):
-        user_message = ' '.join(user_message)
-    if user_message == "":
+    if isinstance(i_user_message, list):
+        i_user_message = ' '.join(i_user_message)
+    if i_user_message == "":
         return jsonify({"error": "No message provided"}), 400
 
-    user_message = USER_NAME + ":" + user_message
     user_id = data.get("user_id")
 
     # Firestore からユーザー情報を取得
@@ -111,6 +109,7 @@ def texthook_handler():
         user_doc = doc_ref.get()
         public_url = []
         local_path = []
+        user_name = USER_NAME
         if user_doc.exists:
             user_data = user_doc.to_dict()
         else:
@@ -118,8 +117,13 @@ def texthook_handler():
                 'messages': [],
                 'updated_date_string': nowDate,
                 'daily_usage': 0,
-                'start_free_day': datetime.now(jst)
+                'start_free_day': datetime.now(jst),
+                'user_name': USER_NAME
             }
+            
+        user_name = user_data['user_name']
+            
+        user_message = user_name + ":" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
@@ -132,19 +136,19 @@ def texthook_handler():
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
 
+
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        # メッセージリストの全ての要素を文字列に変換
+        messages_str_list = [msg['content'] for msg in user_data['messages']]
 
-        response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': messages_for_api},
-            timeout=50
-        )
+        # それぞれの要素を改行コードで連結
+        question = SYSTEM_PROMPT + "\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
 
-        if response.status_code == 200:
-            response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+        result, public_img_url, public_img_url_s = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE)
+
+        if result:
+            bot_reply = result
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
@@ -178,8 +182,18 @@ def get_chat_log():
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
 @app.route('/get_username', methods=['GET'])
-def get_username():    
-    return jsonify({"username": USER_NAME})
+def get_username():
+    user_id = request.args.get('user_id', DEFAULT_USER_ID) # デフォルトのユーザーIDを使用
+    doc_ref = db.collection(u'users').document(user_id)
+    user_doc = doc_ref.get()
+
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+        user_name = user_data.get('user_name', USER_NAME) # デフォルトのユーザー名を使用
+    else:
+        user_name = USER_NAME
+    
+    return jsonify({"username": user_name})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

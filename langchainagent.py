@@ -1,7 +1,6 @@
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
 from langchain_community.chat_models import ChatOpenAI
-from langchain_community.utilities.google_search import GoogleSearchAPIWrapper
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from openai import OpenAI
@@ -12,23 +11,21 @@ from bs4 import BeautifulSoup
 from google.cloud import storage
 from PIL import Image
 import io
+import uuid
 
 public_url = []
 public_url_original = []
 public_url_preview = []
     
 user_id = []
-message_id = []
 bucket_name = []
 file_age = []
 
-llm = ChatOpenAI(model="gpt-3.5-turbo")
+GPT_MODEL = "gpt-3.5-turbo"
 
-google_search = GoogleSearchAPIWrapper()
+llm = ChatOpenAI(model=GPT_MODEL)
+
 wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang='ja', doc_content_chars_max=1000, load_all_available_meta=True))
-
-def google_search_results(query):
-    return google_search.results(query, 5)
 
 def clock(dummy):
     jst = pytz.timezone('Asia/Tokyo')
@@ -122,9 +119,9 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 def generate_image(prompt):
     global public_url_original
     global public_url_preview
-    
-    blob_path = f'{user_id}/{message_id}.png'
-    preview_blob_path = f'{user_id}/{message_id}_s.png'
+    filename = str(uuid.uuid4())
+    blob_path = f'{user_id}/{filename}.png'
+    preview_blob_path = f'{user_id}/{filename}_s.png'
     client = OpenAI()
     try:
         response = client.images.generate(
@@ -161,11 +158,6 @@ def generate_image(prompt):
 
 tools = [
     Tool(
-        name = "Search",
-        func=google_search_results,
-        description="useful for when you need to answer questions about current events. it is single-input tool Search."
-    ),
-    Tool(
         name = "Clock",
         func=clock,
         description="useful for when you need to know what time it is. it is single-input tool."
@@ -188,17 +180,17 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
-def langchain_agent(question, USER_ID, MESSAGE_ID, BUCKET_NAME=None, FILE_AGE=None):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
     global user_id
-    global message_id
     global bucket_name
     global file_age
     global public_url_original
     global public_url_preview
+    global GPT_MODEL
+    GPT_MODEL = gpt_model
     public_url_original = []
     public_url_preview = []
     user_id = USER_ID
-    message_id = MESSAGE_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     
