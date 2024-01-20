@@ -33,7 +33,7 @@ BACKET_NAME = 'galgegpt'
 FILE_AGE = 1 
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
-COLLECTION_NAME = 'galgagpt'
+DATABASE_NAME_NAME = 'galgagpt'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -41,7 +41,7 @@ app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
 # Firestore クライアントの初期化
 try:
-    db = firestore.Client()
+    db = firestore.Client(database=DATABASE_NAME)
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
