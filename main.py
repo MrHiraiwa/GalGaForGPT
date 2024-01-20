@@ -33,7 +33,7 @@ BACKET_NAME = 'galgegpt'
 FILE_AGE = 1 
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
-DATABASE_NAME_NAME = 'galgagpt'
+DATABASE_NAME = 'galgagpt'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
