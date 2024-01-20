@@ -25,6 +25,7 @@ GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
 USER_NAME = '名無しさん'
 SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前はさくらです。'
+PAINT_PROMPT = '黒髪ロングの眼鏡の似合う女性の日本のアニメ調のイラストを生成してください。'
 PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
@@ -157,7 +158,7 @@ def texthook_handler():
             bot_reply = result
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
             if voice_onoff:
-                public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
+                public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID, PAINT_PROMPT)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
