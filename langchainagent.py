@@ -111,6 +111,7 @@ def generate_image(prompt):
     blob_path = f'{user_id}/{filename}.png'
     preview_blob_path = f'{user_id}/{filename}_s.png'
     client = OpenAI()
+    prompt = PAINT_PROMPT + "\n" + prompt
     try:
         response = client.images.generate(
             model="dall-e-3",
@@ -172,19 +173,21 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False)
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=None):
     global user_id
     global bucket_name
     global file_age
     global public_url_original
     global GPT_MODEL
     global username
+    global paint_prompt
     GPT_MODEL = gpt_model
     public_url_original = []
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     username= ""
+    paint_prompt = PAINT_PROMPT
     
     try:
         result = mrkl.run(question)
