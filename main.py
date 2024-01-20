@@ -192,6 +192,9 @@ def get_username():
     if user_doc.exists:
         user_data = user_doc.to_dict()
         user_name = user_data.get('user_name', USER_NAME) # デフォルトのユーザー名を使用
+        if user_name is None:
+            user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
+
     else:
         user_name = USER_NAME
     
