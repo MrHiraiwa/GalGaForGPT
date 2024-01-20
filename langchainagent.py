@@ -137,7 +137,7 @@ def generate_image(prompt):
     public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
 
-    return 'generated the image. The image you generated has already been displayed to the user. No need to send URL.'
+    return 'generated the image.'
 
 def set_username(prompt):
     global username
@@ -182,7 +182,7 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global username
     global paint_prompt
     GPT_MODEL = gpt_model
-    public_url_original = []
+    public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
