@@ -29,6 +29,13 @@ function playAudio(audioUrl) {
     }
 }
 
+function convertURLsToLinks(text) {
+    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gi;
+    return text.replace(urlRegex, function(url) {
+        return '<a href="' + url + '" target="_blank">' + url + '</a>';
+    });
+}
+
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = message;
@@ -97,7 +104,7 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let fullMessage = message;
+    let fullMessage = convertURLsToLinks(message);
     let i = 0;
     
     function typeWriter() {
@@ -114,7 +121,7 @@ function setUserMessage(messageDiv, message, isUser) {
 }
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    let fullMessage = message;
+    let fullMessage = convertURLsToLinks(message);
     let i = 0;
 
     function typeWriter() {
@@ -261,3 +268,5 @@ function sendAudioData(audioBlob) {
         }
     });
 }
+
+
