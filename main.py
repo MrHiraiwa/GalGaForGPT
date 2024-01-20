@@ -169,7 +169,7 @@ def texthook_handler():
             user_data['user_name'] = user_name
             doc_ref.set(user_data, merge=True)
 
-            return jsonify({"reply": bot_reply, "audio_url": public_url})
+            return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
         else:
             print(f"Error with OpenAI API: {response.text}")
             return jsonify({"error": "Unable to process your request"}), 500
