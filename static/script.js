@@ -98,7 +98,6 @@ function sendMessage() {
 
 function setUserMessage(messageDiv, message, isUser) {
     let fullMessage = message;
-    messageDiv.innerHTML = fullMessage;
     let i = 0;
     
     function typeWriter() {
@@ -116,7 +115,6 @@ function setUserMessage(messageDiv, message, isUser) {
 
 function setBotMessage(messageDiv, message, isUser, callback) {
     let fullMessage = message;
-    messageDiv.innerHTML = fullMessage;
     let i = 0;
 
     function typeWriter() {
