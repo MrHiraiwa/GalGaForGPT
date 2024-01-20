@@ -81,6 +81,7 @@ function sendMessage() {
             if (voice_onoff){
                 playAudio(data.audio_url); // 音声を再生
             }
+            img_url = data.img_url
             if (img_url){
                 //画像を変更。
             }
@@ -249,6 +250,10 @@ function sendAudioData(audioBlob) {
             .then(data => {
                 if (voice_onoff){
                     playAudio(data.audio_url); // 音声を再生
+                }
+                img_url = data.img_url
+                if (img_url){
+                    //画像を変更。
                 }
                 var botMessageDiv = addBlankMessage(chatBox);
                 setBotMessage(botMessageDiv, data.reply, false, () => {
