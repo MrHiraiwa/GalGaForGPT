@@ -12,3 +12,4 @@ langchain-community
 beautifulsoup4
 wikipedia
 openai
+Pillow
