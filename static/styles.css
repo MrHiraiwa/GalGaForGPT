@@ -9,6 +9,9 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: -1; /* 背景に配置 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 body {
