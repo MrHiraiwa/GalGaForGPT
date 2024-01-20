@@ -163,7 +163,7 @@ tools = [
     Tool(
         name = "Search",
         func=google_search_results,
-        description="useful for when you need to answer questions about current events. it is single-input tool Search."
+        description="useful for when you need to answer questions about recent events. it is single-input tool Search. After searching, please refer to the page using Scraping and check the details."
     ),
     Tool(
         name = "Clock",
