@@ -13,7 +13,6 @@ body {
   width: 100%;
   box-sizing: border-box;
   font-size: clamp(15px, 1vw, 25px);
-  background-image: url('https://assets.st-note.com/img/1683894319155-7lAfiEZRHw.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
