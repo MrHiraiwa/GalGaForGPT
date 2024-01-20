@@ -127,6 +127,7 @@ def texthook_handler():
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
+            user_data['user_name'] = ""
             user_data['updated_date_string'] = nowDate
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
