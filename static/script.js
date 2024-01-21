@@ -2,12 +2,6 @@ let userId = window.preloadedUserId; // サーバーサイドから提供され�
 let recorder, stream;
 let chunks = [];
 
-const img = new Image();
-img.onload = function() {
-    document.getElementById('backgroundImage').style.backgroundImage = 'url(' + img.src + ')';
-};
-img.src = "https://assets.st-note.com/img/1705785023024-RNIlDpXxqG.png";
-
 function getUserIdFromCookie() {
     const cookies = document.cookie.split('; ');
     const userCookie = cookies.find(row => row.startsWith('userId='));
@@ -162,6 +156,7 @@ function addBlankMessage(chatBox) {
     return blankDiv;
 }
 
+document.getElementById('backgroundImage').style.backgroundImage = 'url("https://assets.st-note.com/img/1705818395549-T1t40W3WfI.png")';
 window.onload = function() {
     const userId = window.preloadedUserId || 'default_user_id';
     fetch('/generate_image?user_id=' + userId)
