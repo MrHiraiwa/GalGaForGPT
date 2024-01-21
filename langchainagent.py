@@ -182,7 +182,7 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, agent_kwargs=agent_kwargs, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT="", CHAT_HISTORY="", BOT_NAME, USER_NAME):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT="", CHAT_HISTORY="", BOT_NAME="", USER_NAME=""):
     global user_id
     global bucket_name
     global file_age
