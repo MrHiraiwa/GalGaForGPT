@@ -169,7 +169,7 @@ window.onload = function() {
         if (img_url) {
             const img = new Image();
             img.onload = function() {
-                document.getElementById('backgroundImage').style.backgroundImage = 'url(' + img_url + ')';
+                changeBackgroundImage(img_url);
                 document.getElementById('chatBox').style.opacity = "1";
                 document.getElementById('userInput').style.opacity = "1";
                 var buttons = document.getElementsByTagName('button');
