@@ -157,7 +157,7 @@ function addBlankMessage(chatBox) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('backgroundImage').style.backgroundImage = 'url("https://assets.st-note.com/img/1705818395549-T1t40W3WfI.png")';
+    document.getElementById('backgroundImage').style.backgroundImage = 'url("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png")';
 });
 
 window.onload = function() {
