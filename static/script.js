@@ -156,11 +156,8 @@ function addBlankMessage(chatBox) {
     return blankDiv;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('backgroundImage').style.backgroundImage = 'url("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png")';
-});
-
 window.onload = function() {
+    changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
     const userId = window.preloadedUserId || 'default_user_id';
     fetch('/generate_image?user_id=' + userId)
     .then(response => response.json())
