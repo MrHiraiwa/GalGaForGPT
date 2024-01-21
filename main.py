@@ -116,8 +116,11 @@ def texthook_handler():
         public_url = []
         local_path = []
         user_name = USER_NAME
+        recent_messages_str = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
+            recent_messages = user_data['messages'][-5:]
+            recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
         else:
             user_data = {
                 'messages': [],
@@ -133,7 +136,8 @@ def texthook_handler():
             user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
         
         user_message = user_name + ":" + i_user_message
-        langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話です。\n" + user_message
+        
+        langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話の最近の履歴です。\n" + recent_messages_str + "\n以下はユーザーの現在の問い合わせです。\n" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
