@@ -29,7 +29,7 @@ DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合
 GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
 USER_NAME = '名無しさん'
-SYSTEM_PROMPT = 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。相手の名前が「名無しさん」だったら名称不明という意味なので本当の名前を聞いてください。'
+SYSTEM_PROMPT = 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。相手の名前が「名無しさん」なら本当の名前を聞いてください。'
 PAINT_PROMPT = '黒髪ロングの眼鏡の似合う女性の日本のアニメ調のイラストを生成してください。日本の一般的な街の景色の中に女性を存在させてください。1つの絵に絵を2つ入れないでください。'
 PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
@@ -153,7 +153,7 @@ def texthook_handler():
         messages_str_list = [msg['content'] + "\n" for msg in user_data['messages']]
 
         # それぞれの要素を改行コードで連結
-        question = SYSTEM_PROMPT + "\n現在の会話にのみ返信してください。\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
+        question = SYSTEM_PROMPT + "\n現在の会話にのみ返信してください。\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は現在あなたに問いかけている会話です。\n" + user_message + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list)
         
         result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
         if i_user_name:
