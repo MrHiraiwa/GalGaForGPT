@@ -195,7 +195,7 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     username = ""
     bot_name = BOT_NAME
     user_name = USER_NAME
-    
+    print(f"question:{question}, chat_history:{chat_history}, bot_name:{bot_name}, user_name:{user_name}")
     try:
         result = mrkl.run(input=question, chat_history=chat_history, ai_prefix=bot_name, human_prefix=user_name)
         return result, public_url_original, username
