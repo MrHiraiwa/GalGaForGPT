@@ -105,7 +105,8 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         print(f"Failed to upload file: {e}")
         raise
 
-def generate_image(prompt):
+def generate_image(arguments):
+    prompt = arguments.get("arguments")
     print(f"Prompt: {prompt}")
     global public_url_original
     filename = str(uuid.uuid4())
