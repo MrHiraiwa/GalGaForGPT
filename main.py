@@ -153,9 +153,10 @@ def texthook_handler():
         messages_str_list = [msg['content'] + "\n" for msg in user_data['messages']]
 
         # それぞれの要素を改行コードで連結
-        question = "\n現在の会話にのみ返信してください。\n\n以下は会話のシチュエーションです。\n" + PROLOGUE  + "\n\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n\n以下は現在あなたに問いかけている会話です。\n" + user_message
+        chat_history = messages_str_list
+        question = user_message
         
-        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, SYSTEM_PROMPT, PAINT_PROMPT)
+        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, SYSTEM_PROMPT, PAINT_PROMPT, chat_history)
         if i_user_name:
             user_name = i_user_name
 
