@@ -167,17 +167,13 @@ window.onload = function() {
     .then(data => {
         const img_url = data.img_url;
         if (img_url) {
-            const img = new Image();
-            img.onload = function() {
-                changeBackgroundImage(img_url);
-                document.getElementById('chatBox').style.opacity = "1";
-                document.getElementById('userInput').style.opacity = "1";
-                var buttons = document.getElementsByTagName('button');
-                for (var i = 0; i < buttons.length; i++) {
+            changeBackgroundImage(img_url);
+            document.getElementById('chatBox').style.opacity = "1";
+            document.getElementById('userInput').style.opacity = "1";
+            var buttons = document.getElementsByTagName('button');
+            for (var i = 0; i < buttons.length; i++) {
                     buttons[i].style.opacity = "1";
                 }
-            };
-            img.src = img_url;
         } else {
             showBodyElements();
         }
