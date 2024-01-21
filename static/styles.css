@@ -1,6 +1,10 @@
 html, body {
   height: 100%;
 }
+#chatBox, #userInput, button {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
 
 #backgroundImage {
   position: fixed; /* 固定位置 */
@@ -28,8 +32,6 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 2s ease-in-out;
 }
 
 #chatBox {
