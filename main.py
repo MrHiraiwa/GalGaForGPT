@@ -150,7 +150,7 @@ def texthook_handler():
         # OpenAI API へのリクエスト
         #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
         # メッセージリストの全ての要素を文字列に変換
-        messages_str_list = [msg['content'] for msg in user_data['messages']]
+        messages_str_list = [msg['content'] + "\n" for msg in user_data['messages']]
 
         # それぞれの要素を改行コードで連結
         question = SYSTEM_PROMPT + "\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
