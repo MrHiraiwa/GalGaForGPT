@@ -119,7 +119,7 @@ function setUserMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            chatBox.scrollTop = chatBox.scrollHeight;
             setTimeout(typeWriter, 100);
         }
     }
@@ -135,7 +135,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            chatBox.scrollTop = chatBox.scrollHeight;
             i++;
             setTimeout(typeWriter, 100);
         } else {
