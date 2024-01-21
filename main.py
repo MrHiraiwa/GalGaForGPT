@@ -141,6 +141,8 @@ def texthook_handler():
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
+        result, public_img_url, i_user_name = langchain_agent(user_message, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
+
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
@@ -148,21 +150,25 @@ def texthook_handler():
 
 
         # OpenAI API へのリクエスト
-        #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
-        # メッセージリストの全ての要素を文字列に変換
-        messages_str_list = [msg['content'] + "\\n" for msg in user_data['messages']]
-
-        # それぞれの要素を改行コードで連結
-        chat_history = messages_str_list
-        question = user_message
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
         
-        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, SYSTEM_PROMPT, PAINT_PROMPT, chat_history, BOT_NAME, USER_NAME)
-        if i_user_name:
-            user_name = i_user_name
+        response = requests.post(
+            'https://api.openai.com/v1/chat/completions',
+            headers={'Authorization': f'Bearer {openai_api_key}'},
+            json={'model': GPT_MODEL, 'messages': messages_for_api},
+            timeout=50
+        )
 
-        if result:
-            bot_reply = result
+        if response.status_code == 200:
+            response_json = response.json()
+            bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
+            public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
+            bot_reply = BOT_NAME + ":" + bot_reply
+        
+            if i_user_name:
+                user_name = i_user_name
+
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
