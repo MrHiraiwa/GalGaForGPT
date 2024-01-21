@@ -170,7 +170,12 @@ window.onload = function() {
             const img = new Image();
             img.onload = function() {
                 document.getElementById('backgroundImage').style.backgroundImage = 'url(' + img_url + ')';
-                showBodyElements();
+                document.getElementById('chatBox').style.opacity = "1";
+                document.getElementById('userInput').style.opacity = "1";
+                var buttons = document.getElementsByTagName('button');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].style.opacity = "1";
+                }
             };
             img.src = img_url;
         } else {
@@ -178,18 +183,6 @@ window.onload = function() {
         }
     });
 };
-
-function showBodyElements() {
-    document.body.style.opacity = "1";
-    fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
-
-    document.getElementById("userInput").addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // フォームの自動送信を防止
-            sendMessage();
-        }
-    });
-}
 
 function fetchChatLog() {
     fetch(`/get_chat_log?user_id=${userId}`)
