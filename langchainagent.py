@@ -144,8 +144,6 @@ def set_username(prompt):
     username = prompt
     return
 
-agent_kwargs = {"input_variables": ["input", "chat_history", "ai_prefix", "human_prefix"]}
-
 tools = [
     Tool(
         name = "Clock",
@@ -173,31 +171,24 @@ tools = [
         description="You can set the name of the conversation partner. it is single-input tool."
     ),
 ]
-mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, agent_kwargs=agent_kwargs, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
+mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT="", CHAT_HISTORY="", BOT_NAME="", USER_NAME=""):
+def langchain_agent(question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
     global user_id
     global bucket_name
     global file_age
     global public_url_original
-    global GPT_MODEL
     global username
     global paint_prompt
     
-    GPT_MODEL = gpt_model
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
-    system_prompt = SYSTEM_PROMPT
     paint_prompt = PAINT_PROMPT
-    chat_history = CHAT_HISTORY
     username = ""
-    bot_name = BOT_NAME
-    user_name = USER_NAME
-    print(f"question:{question}, chat_history:{chat_history}, bot_name:{bot_name}, user_name:{user_name}")
     try:
-        result = mrkl.run(input=question, chat_history=chat_history, ai_prefix=bot_name, human_prefix=user_name)
+        result = mrkl.run(question)
         return result, public_url_original, username
     except Exception as e:
         print(f"An error occurred: {e}")
