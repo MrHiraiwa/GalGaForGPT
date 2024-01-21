@@ -137,7 +137,7 @@ def generate_image(prompt):
     public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
 
-    return
+    return "changed the scene."
 
 def set_username(prompt):
     global username
