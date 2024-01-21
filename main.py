@@ -150,13 +150,13 @@ def texthook_handler():
         # OpenAI API へのリクエスト
         #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
         # メッセージリストの全ての要素を文字列に変換
-        messages_str_list = [msg['content'] + "\n" for msg in user_data['messages']]
+        messages_str_list = [msg['content'] + "\\n" for msg in user_data['messages']]
 
         # それぞれの要素を改行コードで連結
         chat_history = messages_str_list
         question = user_message
         
-        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, SYSTEM_PROMPT, PAINT_PROMPT, chat_history)
+        result, public_img_url, i_user_name = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE, SYSTEM_PROMPT, PAINT_PROMPT, chat_history, BOT_NAME, USER_NAME)
         if i_user_name:
             user_name = i_user_name
 
