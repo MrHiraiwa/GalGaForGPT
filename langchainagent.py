@@ -144,6 +144,9 @@ def set_username(prompt):
     username = prompt
     return
 
+global system_prompt = ""
+agent_kwargs = {"prefix": system_prompt}
+
 tools = [
     Tool(
         name = "Clock",
@@ -171,9 +174,9 @@ tools = [
         description="You can set the name of the conversation partner. it is single-input tool."
     ),
 ]
-mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
+mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, agent_kwargs=agent_kwargs, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT=""):
     global user_id
     global bucket_name
     global file_age
@@ -181,12 +184,14 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global GPT_MODEL
     global username
     global paint_prompt
+    global system_prompt
     GPT_MODEL = gpt_model
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     username= ""
+    system_prompt = SYSTEM_PROMPT
     paint_prompt = PAINT_PROMPT
     
     try:
