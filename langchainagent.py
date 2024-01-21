@@ -144,14 +144,7 @@ def set_username(prompt):
     username = prompt
     return
 
-system_prompt = ""
-chat_history = ""
-bot_name = ""
-user_name = ""
-agent_kwargs = {"prefix": system_prompt,
-                "suffix": "Begin!\\n\\nPrevious conversation history:\\n" + chat_history + "\\n\\nNew input: {input}\\n{agent_scratchpad}",
-                "ai_prefix": bot_name,
-                "human_prefix": user_name}
+agent_kwargs = {"input_variables": ["input", "chat_history", "ai_prefix", "human_prefix"]}
 
 tools = [
     Tool(
@@ -190,10 +183,7 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global GPT_MODEL
     global username
     global paint_prompt
-    global system_prompt
-    global chat_history
-    global bot_name
-    global user_name
+    
     GPT_MODEL = gpt_model
     public_url_original = None
     user_id = USER_ID
@@ -207,7 +197,7 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     user_name = USER_NAME
     
     try:
-        result = mrkl.run(question)
+        result = mrkl.run(input=question, chat_history=chat_history, ai_prefix=bot_name, human_prefix=user_name)
         return result, public_url_original, username
     except Exception as e:
         print(f"An error occurred: {e}")
