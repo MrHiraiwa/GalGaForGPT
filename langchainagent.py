@@ -106,6 +106,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         raise
 
 def generate_image(prompt):
+    print(f"Prompt: {prompt}")
     global public_url_original
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
