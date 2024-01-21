@@ -142,8 +142,9 @@ def texthook_handler():
             return jsonify({"reply": FORGET_MESSAGE})
 
         result, public_img_url, i_user_name = langchain_agent(user_message, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
+        result = "\n以下はユーザーの問い合わせに対する参考情報です。\n" + result
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(result)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
