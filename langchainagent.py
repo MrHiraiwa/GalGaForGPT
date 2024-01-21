@@ -105,9 +105,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         print(f"Failed to upload file: {e}")
         raise
 
-def generate_image(arguments):
-    prompt = arguments.get("arguments")
-    print(f"Prompt: {prompt}")
+def generate_image(prompt):
     global public_url_original
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
@@ -173,7 +171,7 @@ tools = [
         description="You can set the name of the conversation partner. it is single-input tool."
     ),
 ]
-mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False)
+mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
 
 def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
     global user_id
