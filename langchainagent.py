@@ -144,7 +144,7 @@ def set_username(prompt):
     username = prompt
     return
 
-global system_prompt = ""
+system_prompt = ""
 agent_kwargs = {"prefix": system_prompt}
 
 tools = [
