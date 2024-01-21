@@ -145,7 +145,13 @@ def set_username(prompt):
     return
 
 system_prompt = ""
-agent_kwargs = {"prefix": system_prompt}
+chat_history = ""
+bot_name = ""
+user_name = ""
+agent_kwargs = {"prefix": system_prompt,
+                "suffix": "Begin!\\n\\nPrevious conversation history:\\n" + chat_history + "\\n\\nNew input: {input}\\n{agent_scratchpad}",
+                "ai_prefix": bot_name,
+                "human_prefix": user_name}
 
 tools = [
     Tool(
@@ -176,7 +182,7 @@ tools = [
 ]
 mrkl = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, agent_kwargs=agent_kwargs, verbose=False, handle_parsing_errors="Check your output and make sure it conforms, use the Action/Action Input syntax")
 
-def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT="", CHAT_HISTORY=""):
+def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, SYSTEM_PROMPT="" , PAINT_PROMPT="", CHAT_HISTORY="", BOT_NAME, USER_NAME):
     global user_id
     global bucket_name
     global file_age
@@ -186,18 +192,22 @@ def langchain_agent(gpt_model, question, USER_ID, BUCKET_NAME=None, FILE_AGE=Non
     global paint_prompt
     global system_prompt
     global chat_history
+    global bot_name
+    global user_name
     GPT_MODEL = gpt_model
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
-    username= ""
     system_prompt = SYSTEM_PROMPT
     paint_prompt = PAINT_PROMPT
     chat_history = CHAT_HISTORY
+    username = ""
+    bot_name = BOT_NAME
+    user_name = USER_NAME
     
     try:
-        result = mrkl.run(question, chat_history)
+        result = mrkl.run(question)
         return result, public_url_original, username
     except Exception as e:
         print(f"An error occurred: {e}")
