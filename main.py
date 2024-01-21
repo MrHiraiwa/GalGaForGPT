@@ -133,6 +133,7 @@ def texthook_handler():
             user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
         
         user_message = user_name + ":" + i_user_message
+        langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話です。\n" + user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
@@ -141,7 +142,7 @@ def texthook_handler():
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
-        result, public_img_url, i_user_name = langchain_agent(user_message, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
+        result, public_img_url, i_user_name = langchain_agent(langchain_prompt, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
         result = "\n以下はユーザーの問い合わせに対する参考情報です。\n" + result
 
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(result)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
