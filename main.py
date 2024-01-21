@@ -162,7 +162,6 @@ def texthook_handler():
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
-            bot_reply = BOT_NAME + ":" + bot_reply
         
             if i_user_name:
                 user_name = i_user_name
