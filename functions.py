@@ -8,6 +8,7 @@ from google.cloud import storage
 import io
 import uuid
 import functions_config as cf
+import json
 
 openai_api_key = os.getenv('OPENAI_API_KEY')
 gpt_client = OpenAI(api_key=openai_api_key)
