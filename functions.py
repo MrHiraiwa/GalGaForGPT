@@ -156,18 +156,15 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     paint_prompt = PAINT_PROMPT
-    username = ""
     
     response = run_conversation(GPT_MODEL, messages_for_api)
-    print(f"response: {response}")
     if response:
-        bot_reply = response.choices[0].message.content
-        # function_call をチェック
-        if "function_call" in response:  # response が辞書型かどうかを確認
-            function_call = response["function_call"]
-            if function_call and "name" in function_call and function_call["name"] == "set_UserName":
-                arguments = json.loads(function_call["arguments"])
-                bot_reply = set_username(arguments)
+        function_call = response.choices[0].message.function_call
+        if function_call and function_call.name == "set_UserName":
+            arguments = json.loads(function_call.arguments)
+            bot_reply = set_username(arguments["username"])
+        else:
+            bot_reply = "Function call not recognized or content is None"
     else:
         bot_reply = "An error occurred while processing the question"
 
