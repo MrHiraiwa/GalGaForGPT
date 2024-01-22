@@ -142,6 +142,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     file_age = FILE_AGE
     paint_prompt = PAINT_PROMPT
     username = ""
+    bot_reply = ""
     try:
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
