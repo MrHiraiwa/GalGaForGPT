@@ -159,12 +159,12 @@ def texthook_handler():
         # OpenAI API へのリクエスト
         messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
-        response = gpt_client.chat.completions.create(
-            model=GPT_MODEL,
-            messages=messages_for_api
-         )
+        try:
+            response = gpt_client.chat.completions.create(
+                model=GPT_MODEL,
+                messages=messages_for_api
+             )
 
-        if response.status_code == 200:
             response_json = response.json()
             bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
@@ -185,8 +185,8 @@ def texthook_handler():
             doc_ref.set(user_data, merge=True)
 
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
-        else:
-            print(f"Error with OpenAI API: {response.text}")
+        except Exception as e:
+            print(f"APIError with OpenAI API: {str(e)}")
             return jsonify({"error": "Unable to process your request"}), 500
     return update_in_transaction(db.transaction(), doc_ref)
 
