@@ -140,7 +140,7 @@ def run_conversation(GPT_MODEL, messages):
     try:
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
-            messages=messages_for_api,
+            messages=messages,
             functions=cf.functions,
             function_call="auto",
         )
