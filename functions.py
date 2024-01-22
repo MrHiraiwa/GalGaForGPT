@@ -142,6 +142,17 @@ def run_conversation(GPT_MODEL, messages):
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
             messages=messages,
+        )
+        return response  # レスポンス全体を返す
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # エラー時には None を返す
+
+def run_conversation_f(GPT_MODEL, messages):
+    try:
+        response = gpt_client.chat.completions.create(
+            model=GPT_MODEL,
+            messages=messages,
             functions=cf.functions,
             function_call="auto",
         )
@@ -162,7 +173,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     i_messages_for_api = messages_for_api
 
     while attempt < max_attempts:
-        response = run_conversation(GPT_MODEL, i_messages_for_api)
+        response = run_conversation_f(GPT_MODEL, i_messages_for_api)
         print(f"response: {response}")
         if response:
             bot_reply = response.choices[0].message.content
@@ -174,9 +185,8 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                 attempt += 1
             else:
-                i_messages_for_api = []
                 return bot_reply, public_url_original, username
         else:
             return "An error occurred while processing the question", public_url_original, username
-
+    response = run_conversation(GPT_MODEL, messages_for_api)
     return bot_reply, public_url_original, username
