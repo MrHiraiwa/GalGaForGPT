@@ -148,9 +148,9 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
             model=GPT_MODEL,
             messages=messages_for_api
         )
-        print(response)  # レスポンスの構造を出力して確認
         bot_reply = response.choices[0].message.content
     except Exception as e:
         print(f"An error occurred: {e}")
         bot_reply = "An error occurred while processing the question"
+
     return bot_reply, public_url_original, username
