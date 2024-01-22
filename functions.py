@@ -135,7 +135,7 @@ def generate_image(prompt):
 
 def set_username(prompt):
     username = prompt
-    return f"Set the username as {username}", username
+    return f"Set the username.", username
 
 def run_conversation(GPT_MODEL, messages):
     try:
@@ -171,7 +171,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 arguments = json.loads(function_call.arguments)
                 bot_reply, username = set_username(arguments["username"])
                 # ここで再帰的に chatgpt_functions を呼び出すか、messages_for_api を更新して再度 run_conversation を呼び出す
-                i_messages_for_api.append({"role": "user", "content": bot_reply})
+                i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                 attempt += 1
             else:
                 return bot_reply, public_url_original, username
