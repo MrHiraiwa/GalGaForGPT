@@ -135,7 +135,7 @@ def generate_image(prompt):
 
 def set_username(prompt):
     username = prompt
-    return f"Set the username.", username
+    return f"SYSTEM: Set the username.", username
 
 def run_conversation(GPT_MODEL, messages):
     try:
