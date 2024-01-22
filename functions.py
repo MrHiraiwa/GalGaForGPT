@@ -144,12 +144,10 @@ def run_conversation(GPT_MODEL, messages):
             functions=cf.functions,
             function_call="auto",
         )
-        bot_reply = response.choices[0].message.content
+        return response  # レスポンス全体を返す
     except Exception as e:
         print(f"An error occurred: {e}")
-        bot_reply = "An error occurred while processing the question"
-    return bot_reply
-
+        return None  # エラー時には None を返す
 
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
     global username
@@ -159,13 +157,17 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     file_age = FILE_AGE
     paint_prompt = PAINT_PROMPT
     username = ""
-    bot_reply = ""
     
-    bot_reply = run_conversation(GPT_MODEL, messages_for_api)
-    if bot_reply.get("function_call"):
-        function_name = message["function_call"]["name"]
-        # その時の引数dict
-        arguments = json.loads(message["function_call"]["arguments"])
-        if function_name == "set_UserName":
-           bot_reply = set_username(arguments)
+    response = run_conversation(GPT_MODEL, messages_for_api)
+    if response:
+        bot_reply = response.choices[0].message.content
+        # function_call をチェック
+        if "function_call" in response:  # response が辞書型かどうかを確認
+            function_call = response["function_call"]
+            if function_call and "name" in function_call and function_call["name"] == "set_UserName":
+                arguments = json.loads(function_call["arguments"])
+                bot_reply = set_username(arguments)
+    else:
+        bot_reply = "An error occurred while processing the question"
+
     return bot_reply, public_url_original, username
