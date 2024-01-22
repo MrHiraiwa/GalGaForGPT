@@ -134,7 +134,7 @@ def generate_image(prompt):
 
 def set_username(prompt):
     username = prompt
-    return f"Set the username as {username}"
+    return f"Set the username as {username}", username
 
 def run_conversation(GPT_MODEL, messages):
     try:
@@ -150,7 +150,6 @@ def run_conversation(GPT_MODEL, messages):
         return None  # エラー時には None を返す
 
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
-    global username
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
@@ -164,7 +163,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
         function_call = response.choices[0].message.function_call
         if function_call and function_call.name == "set_UserName":
             arguments = json.loads(function_call.arguments)
-            bot_reply = set_username(arguments["username"])
+            bot_reply, username  = set_username(arguments["username"])
     else:
         bot_reply = "An error occurred while processing the question"
 
