@@ -134,7 +134,7 @@ def set_username(prompt):
     username = prompt
     return
 
-def chatgpt_functions(GPT_MODEL, question, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
+def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
