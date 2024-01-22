@@ -159,6 +159,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     username = ""
     
     response = run_conversation(GPT_MODEL, messages_for_api)
+    print(f"response: {response}")
     if response:
         bot_reply = response.choices[0].message.content
         # function_call をチェック
