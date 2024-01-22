@@ -149,7 +149,7 @@ def texthook_handler():
             return jsonify({"reply": FORGET_MESSAGE})
 
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
