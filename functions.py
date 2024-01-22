@@ -1,3 +1,4 @@
+import os
 from openai import OpenAI
 from datetime import datetime, time, timedelta
 import pytz
