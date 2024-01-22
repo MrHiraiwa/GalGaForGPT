@@ -136,15 +136,7 @@ def set_username(prompt):
     username = prompt
     return
 
-def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
-    public_url_original = None
-    user_id = USER_ID
-    bucket_name = BUCKET_NAME
-    file_age = FILE_AGE
-    paint_prompt = PAINT_PROMPT
-    username = ""
-    bot_reply = ""
-    functions= messages_for_api
+def run_conversation(GPT_MODEL, messages):
     try:
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
@@ -156,5 +148,18 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     except Exception as e:
         print(f"An error occurred: {e}")
         bot_reply = "An error occurred while processing the question"
+    return bot_reply
 
+
+def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
+    public_url_original = None
+    user_id = USER_ID
+    bucket_name = BUCKET_NAME
+    file_age = FILE_AGE
+    paint_prompt = PAINT_PROMPT
+    username = ""
+    bot_reply = ""
+    
+    bot_reply = run_conversation(GPT_MODEL, messages_for_api)
+    
     return bot_reply, public_url_original, username
