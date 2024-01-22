@@ -7,7 +7,6 @@ tiktoken
 pytz
 requests
 pycryptodome
-langchain
 langchain-community
 beautifulsoup4
 wikipedia
