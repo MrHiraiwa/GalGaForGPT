@@ -156,6 +156,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     paint_prompt = PAINT_PROMPT
+    username = ""
     
     response = run_conversation(GPT_MODEL, messages_for_api)
     if response:
