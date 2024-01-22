@@ -45,6 +45,8 @@ DATABASE_NAME = 'galgagpt'
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
+gpt_client = OpenAI(api_key=openai_api_key)
+
 # Firestore クライアントの初期化
 try:
     db = firestore.Client(database=DATABASE_NAME)
@@ -156,13 +158,11 @@ def texthook_handler():
 
         # OpenAI API へのリクエスト
         messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
-        
-        response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': messages_for_api},
-            timeout=50
-        )
+
+        response = gpt_client.chat.completions.create(
+            model=GPT_MODEL,
+            messages=messages_for_api
+         )
 
         if response.status_code == 200:
             response_json = response.json()
@@ -254,12 +254,11 @@ def generate_image():
 
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
-    client = OpenAI(api_key=openai_api_key)  # APIキーを設定
 
     prompt = PAINT_PROMPT
 
     try:
-        response = client.images.generate(
+        response = gpt_client.images.generate(
             model="dall-e-3",
             prompt=prompt,
             size="1024x1024",
