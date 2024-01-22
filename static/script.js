@@ -127,7 +127,7 @@ function setUserMessage(messageDiv, message, isUser) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
             chatBox.scrollTop = chatBox.scrollHeight;
-            setTimeout(typeWriter, 100);
+            setTimeout(typeWriter, 50);
         }
     }
 
@@ -144,7 +144,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
             messageDiv.textContent += fullMessage.charAt(i);
             chatBox.scrollTop = chatBox.scrollHeight;
             i++;
-            setTimeout(typeWriter, 100);
+            setTimeout(typeWriter, 50);
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
