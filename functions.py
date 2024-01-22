@@ -150,8 +150,6 @@ def run_conversation(GPT_MODEL, messages):
         print(f"An error occurred: {e}")
         return None  # エラー時には None を返す
 
-import json
-
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT="", max_attempts=3):
     public_url_original = None
     user_id = USER_ID
@@ -164,6 +162,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     while attempt < max_attempts:
         response = run_conversation(GPT_MODEL, messages_for_api)
         if response:
+            bot_reply = response.choices[0].message.content
             function_call = response.choices[0].message.function_call
             if function_call and function_call.name == "set_UserName":
                 arguments = json.loads(function_call.arguments)
