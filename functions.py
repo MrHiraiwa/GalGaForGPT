@@ -150,22 +150,30 @@ def run_conversation(GPT_MODEL, messages):
         print(f"An error occurred: {e}")
         return None  # エラー時には None を返す
 
-def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
+import json
+
+def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT="", max_attempts=3):
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
     file_age = FILE_AGE
     paint_prompt = PAINT_PROMPT
     username = ""
-    
-    response = run_conversation(GPT_MODEL, messages_for_api)
-    if response:
-        bot_reply = response.choices[0].message.content
-        function_call = response.choices[0].message.function_call
-        if function_call and function_call.name == "set_UserName":
-            arguments = json.loads(function_call.arguments)
-            bot_reply, username  = set_username(arguments["username"])
-    else:
-        bot_reply = "An error occurred while processing the question"
+    attempt = 0
+
+    while attempt < max_attempts:
+        response = run_conversation(GPT_MODEL, messages_for_api)
+        if response:
+            function_call = response.choices[0].message.function_call
+            if function_call and function_call.name == "set_UserName":
+                arguments = json.loads(function_call.arguments)
+                bot_reply, username = set_username(arguments["username"])
+                # ここで再帰的に chatgpt_functions を呼び出すか、messages_for_api を更新して再度 run_conversation を呼び出す
+                messages_for_api.append({"role": "assistant", "content": bot_reply})
+                attempt += 1
+            else:
+                return response.choices[0].message.content, public_url_original, username
+        else:
+            return "An error occurred while processing the question", public_url_original, username
 
     return bot_reply, public_url_original, username
