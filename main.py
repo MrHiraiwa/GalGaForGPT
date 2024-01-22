@@ -119,6 +119,7 @@ def texthook_handler():
         local_path = []
         user_name = USER_NAME
         recent_messages_str = ""
+        bot_reply = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
             recent_messages = user_data['messages'][-5:]
