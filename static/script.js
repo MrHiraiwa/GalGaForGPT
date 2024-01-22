@@ -29,6 +29,17 @@ function playAudio(audioUrl) {
     }
 }
 
+function changeBackgroundImage(img_url) {
+    document.body.style.backgroundImage = 'url(' + img_url + ')';
+    document.body.classList.add('fade-in');
+
+    // アニメーション終了後にクラスを削除する
+    document.body.addEventListener('animationend', () => {
+        document.body.classList.remove('fade-in');
+    });
+}
+
+
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.textContent = message;
@@ -81,6 +92,10 @@ function sendMessage() {
             if (voice_onoff){
                 playAudio(data.audio_url); // 音声を再生
             }
+            img_url = data.img_url
+            if (img_url){
+                changeBackgroundImage(img_url);
+            }
             var botMessageDiv = addBlankMessage(chatBox);
             setBotMessage(botMessageDiv, data.reply, false, () => {
                 // ボットのメッセージ表示が完了したら入力ボックスと送信ボタンを再度有効化
@@ -104,8 +119,8 @@ function setUserMessage(messageDiv, message, isUser) {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
-            setTimeout(typeWriter, 50);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            setTimeout(typeWriter, 100);
         }
     }
 
@@ -120,9 +135,9 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     function typeWriter() {
         if (i < fullMessage.length) {
             messageDiv.textContent += fullMessage.charAt(i);
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            chatBox.scrollTop = chatBox.scrollHeight;
             i++;
-            setTimeout(typeWriter, 50);
+            setTimeout(typeWriter, 100);
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
@@ -140,15 +155,25 @@ function addBlankMessage(chatBox) {
     chatBox.appendChild(blankDiv);
     return blankDiv;
 }
-window.onload = function() {
-    document.body.classList.add('visible');
-    document.getElementById("chatBox").style.display = "block";
-    fetchChatLog(); // 会話ログを取得して表示する関数の呼び出し
 
-    document.getElementById("userInput").addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // フォームの自動送信を防止
-            sendMessage();
+window.onload = function() {
+    changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
+    const userId = window.preloadedUserId || 'default_user_id';
+    fetchChatLog();
+    fetch('/generate_image?user_id=' + userId)
+    .then(response => response.json())
+    .then(data => {
+        const img_url = data.img_url;
+        if (img_url) {
+            changeBackgroundImage(img_url);
+            document.getElementById('chatBox').style.opacity = "1";
+            document.getElementById('userInput').style.opacity = "1";
+            var buttons = document.getElementsByTagName('button');
+            for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].style.opacity = "1";
+                }
+        } else {
+            showBodyElements();
         }
     });
 };
@@ -246,6 +271,10 @@ function sendAudioData(audioBlob) {
             .then(data => {
                 if (voice_onoff){
                     playAudio(data.audio_url); // 音声を再生
+                }
+                var img_url = data.img_url
+                if (img_url){
+                    changeBackgroundImage(img_url);
                 }
                 var botMessageDiv = addBlankMessage(chatBox);
                 setBotMessage(botMessageDiv, data.reply, false, () => {

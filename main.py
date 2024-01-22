@@ -4,10 +4,15 @@ import requests
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
+from google.cloud import storage
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 import tiktoken
 import re
+import uuid
+from openai import OpenAI
+import requests
+import io
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
@@ -23,8 +28,9 @@ YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアン
 DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
 GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
-USER_NAME = 'たろう'
-SYSTEM_PROMPT = 'あなたは有能な女性秘書です。あなたの名前はさくらです。'
+USER_NAME = '名無しさん'
+SYSTEM_PROMPT = 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。'
+PAINT_PROMPT = '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。生成IDはVyY5daXiltA2L6DNを指定します。'
 PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
@@ -110,8 +116,11 @@ def texthook_handler():
         public_url = []
         local_path = []
         user_name = USER_NAME
+        recent_messages_str = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
+            recent_messages = user_data['messages'][-5:]
+            recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
         else:
             user_data = {
                 'messages': [],
@@ -122,34 +131,47 @@ def texthook_handler():
             }
             
         user_name = user_data['user_name']
-            
+
+        if user_name is None:
+            user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
+        
         user_message = user_name + ":" + i_user_message
+        
+        langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話の最近の履歴です。\n" + recent_messages_str + "\n以下はユーザーの現在の問い合わせです。\n" + i_user_message
 
         if FORGET_KEYWORDS[0] in user_message:
             user_data['messages'] = []
+            user_data['user_name'] = None
             user_data['updated_date_string'] = nowDate
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        result, public_img_url, i_user_name = langchain_agent(langchain_prompt, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
+        result = "\n以下はユーザーの問い合わせに対する参考情報です。\n" + result
+
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(result)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
 
-
         # OpenAI API へのリクエスト
-        #messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
-        # メッセージリストの全ての要素を文字列に変換
-        messages_str_list = [msg['content'] for msg in user_data['messages']]
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        
+        response = requests.post(
+            'https://api.openai.com/v1/chat/completions',
+            headers={'Authorization': f'Bearer {openai_api_key}'},
+            json={'model': GPT_MODEL, 'messages': messages_for_api},
+            timeout=50
+        )
 
-        # それぞれの要素を改行コードで連結
-        question = SYSTEM_PROMPT + "\n以下は会話のシチュエーションです。\n" + PROLOGUE + "\n以下は過去の会話です。\n" + "\n".join(messages_str_list) + "\n以下は現在あなたに問いかけている会話です。\n" + user_message
-
-        result, public_img_url, public_img_url_s = langchain_agent(GPT_MODEL, question, user_id, BACKET_NAME, FILE_AGE)
-
-        if result:
-            bot_reply = result
+        if response.status_code == 200:
+            response_json = response.json()
+            bot_reply = response_json['choices'][0]['message']['content'].strip()
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
+        
+            if i_user_name:
+                user_name = i_user_name
+
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
@@ -159,9 +181,10 @@ def texthook_handler():
             user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
             user_data['daily_usage'] += 1
             user_data['updated_date_string'] = nowDate
+            user_data['user_name'] = user_name
             doc_ref.set(user_data, merge=True)
 
-            return jsonify({"reply": bot_reply, "audio_url": public_url})
+            return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
         else:
             print(f"Error with OpenAI API: {response.text}")
             return jsonify({"error": "Unable to process your request"}), 500
@@ -181,6 +204,86 @@ def get_chat_log():
     else:        
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
+
+def set_bucket_lifecycle(bucket_name, age):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+
+    rule = {
+        'action': {'type': 'Delete'},
+        'condition': {'age': age}  # The number of days after object creation
+    }
+    
+    bucket.lifecycle_rules = [rule]
+    bucket.patch()
+
+    #print(f"Lifecycle rule set for bucket {bucket_name}.")
+
+def bucket_exists(bucket_name):
+    """Check if a bucket exists."""
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    return bucket.exists()
+
+def download_image(image_url):
+    """ PNG画像をダウンロードする """
+    response = requests.get(image_url)
+    return io.BytesIO(response.content)
+
+def upload_blob(bucket_name, source_stream, destination_blob_name, content_type='image/png'):
+    """Uploads a file to the bucket from a byte stream."""
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+
+        blob.upload_from_file(source_stream, content_type=content_type)
+    
+        public_url = f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
+        return public_url
+    except Exception as e:
+        print(f"Failed to upload file: {e}")
+        raise
+        
+@app.route('/generate_image', methods=['GET'])
+def generate_image():
+    user_id = request.args.get('user_id', DEFAULT_USER_ID)
+    bucket_name = BACKET_NAME  # または適切なバケット名を設定
+
+    filename = str(uuid.uuid4())
+    blob_path = f'{user_id}/{filename}.png'
+    client = OpenAI(api_key=openai_api_key)  # APIキーを設定
+
+    prompt = PAINT_PROMPT
+
+    try:
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
+        image_result = response.data[0].url
+
+        if bucket_exists(bucket_name):
+            set_bucket_lifecycle(bucket_name, FILE_AGE)
+        else:
+            print(f"Bucket {bucket_name} does not exist.")
+            return jsonify({"error": "Bucket does not exist"}), 400
+
+        # PNG画像をダウンロード
+        png_image = download_image(image_result)
+
+        # 元のPNG画像をアップロード
+        public_url_original = upload_blob(bucket_name, png_image, blob_path)
+        return jsonify({"img_url": public_url_original})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/get_username', methods=['GET'])
 def get_username():
     user_id = request.args.get('user_id', DEFAULT_USER_ID) # デフォルトのユーザーIDを使用
@@ -190,6 +293,9 @@ def get_username():
     if user_doc.exists:
         user_data = user_doc.to_dict()
         user_name = user_data.get('user_name', USER_NAME) # デフォルトのユーザー名を使用
+        if user_name is None:
+            user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
+
     else:
         user_name = USER_NAME
     
