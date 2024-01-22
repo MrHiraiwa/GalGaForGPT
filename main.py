@@ -164,9 +164,7 @@ def texthook_handler():
                 model=GPT_MODEL,
                 messages=messages_for_api
              )
-
-            response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+            bot_reply = response['choices'][0]['message']
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
         
             if i_user_name:
