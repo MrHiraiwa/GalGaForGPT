@@ -174,6 +174,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                 attempt += 1
             else:
+                i_messages_for_api = []
                 return bot_reply, public_url_original, username
         else:
             return "An error occurred while processing the question", public_url_original, username
