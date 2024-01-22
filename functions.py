@@ -152,6 +152,7 @@ def run_conversation(GPT_MODEL, messages):
 
 
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
+    global username
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
