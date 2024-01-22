@@ -16,7 +16,7 @@ import io
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
-from langchainagent import langchain_agent
+from chatgpt_functions import functions
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -148,10 +148,8 @@ def texthook_handler():
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
-        result, public_img_url, i_user_name = langchain_agent(langchain_prompt, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
-        result = "\n以下はユーザーの問い合わせに対する参考情報です。\n" + result
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(result)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
@@ -160,11 +158,7 @@ def texthook_handler():
         messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
         try:
-            response = gpt_client.chat.completions.create(
-                model=GPT_MODEL,
-                messages=messages_for_api
-             )
-            bot_reply = response.choices[0].message.content
+            response, public_img_url, i_user_name chatgpt_functions(GPT_MODEL, messages_for_api, user_id, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT=""):
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
         
             if i_user_name:
