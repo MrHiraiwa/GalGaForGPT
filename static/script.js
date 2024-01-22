@@ -16,6 +16,13 @@ document.getElementById("voiceToggleButton").addEventListener("click", function(
     updateVoiceButtonLabel(); // ボタンのラベル更新
 });
 
+document.getElementById("userInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
 // 音声のオン・オフ状態に応じてボタンのラベルを更新する関数
 function updateVoiceButtonLabel() {
     const buttonLabel = voice_onoff ? "音声オン" : "音声オフ";
