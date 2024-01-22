@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from google.cloud import storage
 import io
 import uuid
-import config as cf
+import functions_config as cf
 
 openai_api_key = os.getenv('OPENAI_API_KEY')
 gpt_client = OpenAI(api_key=openai_api_key)
@@ -148,7 +148,9 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     try:
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
-            messages=messages_for_api
+            messages=messages_for_api,
+            functions=cf.functions,
+            function_call="auto",
         )
         bot_reply = response.choices[0].message.content
     except Exception as e:
