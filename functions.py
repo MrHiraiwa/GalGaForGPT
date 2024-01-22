@@ -134,7 +134,7 @@ def generate_image(prompt):
 
 def set_username(prompt):
     username = prompt
-    return
+    return "set usernamd."
 
 def run_conversation(GPT_MODEL, messages):
     try:
@@ -161,5 +161,10 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     bot_reply = ""
     
     bot_reply = run_conversation(GPT_MODEL, messages_for_api)
-    
+    if bot_reply.get("function_call"):
+        function_name = message["function_call"]["name"]
+        # その時の引数dict
+        arguments = json.loads(message["function_call"]["arguments"])
+        if function_name == "set_UserName":
+            set_username(arguments)
     return bot_reply, public_url_original, username
