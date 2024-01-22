@@ -151,6 +151,7 @@ def run_conversation(GPT_MODEL, messages):
         return None  # エラー時には None を返す
 
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT="", max_attempts=3):
+    global i_messages_for_api
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
@@ -158,9 +159,10 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     paint_prompt = PAINT_PROMPT
     username = ""
     attempt = 0
+    i_messages_for_api = messages_for_api
 
     while attempt < max_attempts:
-        response = run_conversation(GPT_MODEL, messages_for_api)
+        response = run_conversation(GPT_MODEL, i_messages_for_api)
         if response:
             bot_reply = response.choices[0].message.content
             function_call = response.choices[0].message.function_call
@@ -168,7 +170,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 arguments = json.loads(function_call.arguments)
                 bot_reply, username = set_username(arguments["username"])
                 # ここで再帰的に chatgpt_functions を呼び出すか、messages_for_api を更新して再度 run_conversation を呼び出す
-                messages_for_api.append({"role": "user", "content": bot_reply})
+                i_messages_for_api.append({"role": "user", "content": bot_reply})
                 attempt += 1
             else:
                 return bot_reply, public_url_original, username
