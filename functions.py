@@ -135,7 +135,7 @@ def generate_image(prompt):
 
 def set_username(prompt):
     username = prompt
-    return f"SYSTEM: Set the username.", username
+    return f"SYSTEM: 名前を覚えたことを返信してください。", username
 
 def run_conversation(GPT_MODEL, messages):
     try:
