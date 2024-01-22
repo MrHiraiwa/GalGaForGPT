@@ -16,7 +16,7 @@ import io
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
-from chatgpt_functions import functions
+from functions import chatgpt_functions
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
