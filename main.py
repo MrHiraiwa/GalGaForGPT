@@ -155,7 +155,7 @@ def texthook_handler():
             user_data['messages'].pop(0)
 
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
         try:
             response, public_img_url, i_user_name = chatgpt_functions(GPT_MODEL, messages_for_api, user_id, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT="")
