@@ -189,4 +189,8 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
         else:
             return "An error occurred while processing the question", public_url_original, username
     response = run_conversation(GPT_MODEL, messages_for_api)
+    if response:
+        bot_reply = response.choices[0].message.content
+    else:
+        bot_reply = "An error occurred while processing the question"
     return bot_reply, public_url_original, username
