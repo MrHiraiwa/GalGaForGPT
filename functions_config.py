@@ -40,5 +40,23 @@ functions = [
                 }
             }
         }
-    }
+    },
+    {
+        # 関数の名称
+        "name": "search_wikipedia",
+        # 関数の機能説明
+        "description": "useful for when you need to Read dictionary page by specifying the word. ",
+        # 関数のパラメータ
+        "parameters": {
+            "type": "object",
+            # 各引数
+            "properties": {
+                "prompt": {
+                    "type": "string",
+                    # 引数の説明
+                    "description": "検索ワード"
+                }
+            }
+        }
+    },
 ]
