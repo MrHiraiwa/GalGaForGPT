@@ -109,8 +109,8 @@ def scraping(links):
             # 結果を1000文字に切り詰める
         if len(contents) > 1000:
             summary = contents[:1000] + "..."
-
-    return summary
+            print(f"summary: {summary}")
+    return f"SYSTEM:以下は{links}の読み込み結果です。\n" + summary
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
