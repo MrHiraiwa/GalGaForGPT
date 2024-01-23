@@ -250,6 +250,8 @@ def generate_image():
     user_id = request.args.get('user_id', DEFAULT_USER_ID)
     bucket_name = BACKET_NAME
     last_access_date = ""
+    daily_usage = 0
+    last_image_url = ""
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
 
@@ -258,6 +260,7 @@ def generate_image():
         user_data = user_doc.to_dict()
         last_access_date = user_data.get('updated_date_string')
         last_image_url = user_data.get('last_image_url', None)
+        daily_usage = user_data.get('daily_usage', 0)
     else:
         # ドキュメントが存在しない場合、新しいデータを作成
         user_data = {
