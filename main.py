@@ -326,7 +326,7 @@ def texthook_handler():
                 'user_name': USER_NAME,
                 'last_image_url': ""
             }
-            
+        daily_usage = user_data['daily_usage']
         user_name = user_data['user_name']
 
         if user_name is None:
