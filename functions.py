@@ -100,10 +100,9 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         print(f"Failed to upload file: {e}")
         raise
 
-def generate_image(paint_prompt, prompt):
+def generate_image(paint_prompt, prompt, user_id):
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
-    preview_blob_path = f'{user_id}/{filename}_s.png'
     client = OpenAI()
     prompt = paint_prompt + "\n" + prompt
     try:
@@ -195,7 +194,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 elif function_call.name == "generate_image" and not generate_image_called:
                     generate_image_called = True
                     arguments = json.loads(function_call.arguments)
-                    bot_reply, public_url_original = generate_image(paint_prompt, arguments["prompt"])
+                    bot_reply, public_url_original = generate_image(paint_prompt, arguments["prompt"], user_id)
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
