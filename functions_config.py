@@ -69,7 +69,7 @@ functions = [
             "type": "object",
             # 各引数
             "properties": {
-                "links": {
+                "link": {
                     "type": "string",
                     # 引数の説明
                     "description": "読みたいページのURL"
