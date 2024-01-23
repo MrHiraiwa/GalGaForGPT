@@ -54,7 +54,7 @@ def get_googlesearch(words, num=3, start_index=1, search_lang='lang_ja'):
         snippet = item.get("snippet")
         formatted_results += f"タイトル: {title}\nリンク: {link}\n概要: {snippet}\n\n"
 
-    return "SYSTEM:Webページを検索しました。\n" + formatted_results
+    return f"SYSTEM:Webページを検索しました。{words}と関係のありそうなURLを読み込んでください。\n" + formatted_results
 
 
 def search_wikipedia(prompt):
