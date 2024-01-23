@@ -40,7 +40,7 @@ FILE_AGE = 1
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
 DATABASE_NAME = 'galgagpt'
-LOADING_IMAGE　= 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png'
+LOADING_IMAGE = 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
