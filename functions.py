@@ -9,6 +9,7 @@ import io
 import uuid
 import functions_config as cf
 import json
+import wikipedia
 
 openai_api_key = os.getenv('OPENAI_API_KEY')
 gpt_client = OpenAI(api_key=openai_api_key)
@@ -25,6 +26,17 @@ def clock():
     nowDate = datetime.now(jst) 
     nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
     return "SYSTEM:現在時刻は" + nowDateStr + "です。"
+
+def search_wikipedia(prompt):
+    try:
+        wikipedia.set_lang("ja")
+        search_result = wikipedia.page(prompt)
+        return "SYSTEM: 情報が見つかりました。\n" + search_result.summary
+    except wikipedia.exceptions.DisambiguationError as e:
+        return f"SYSTEM: 曖昧さ解消が必要です。オプション: {e.options}"
+    except wikipedia.exceptions.PageError:
+        return "SYSTEM: ページが見つかりませんでした。"
+
 
 def scraping(links):
     contents = []
