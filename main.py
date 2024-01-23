@@ -97,7 +97,7 @@ def reload_settings():
     MAX_DAILY_USAGE = int(get_setting('MAX_DAILY_USAGE') or 0)
     MAX_DAILY_MESSAGE = get_setting('MAX_DAILY_MESSAGE')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    MAX_TOKEN_NUM = int(get_setting('MAX_TOKEN_NUM or 0)
+    MAX_TOKEN_NUM = int(get_setting('MAX_TOKEN_NUM') or 0)
     FORGET_KEYWORDS = get_setting('FORGET_KEYWORDS')
     FORGET_MESSAGE = get_setting('FORGET_MESSAGE')
     NG_KEYWORDS = get_setting('NG_KEYWORDS')
