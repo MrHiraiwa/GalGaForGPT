@@ -114,6 +114,7 @@ def generate_image(paint_prompt, prompt, user_id):
             n=1,
         )
         image_result = response.data[0].url
+        print(f"image_result: {image_result}")
     except Exception as e:
         return e
 
