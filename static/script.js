@@ -65,7 +65,7 @@ function addMessageWithAnimation(chatBox, message, isUser) {
         } else {
             // 非URLの場合はテキストとして処理
             // 改行を処理
-            const lines = part.split('\\n');
+            const lines = part.split('\n');
             lines.forEach((line, index) => {
                 messageDiv.appendChild(document.createTextNode(line));
                 if (index < lines.length - 1) {
