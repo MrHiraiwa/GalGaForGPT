@@ -20,7 +20,7 @@ bucket_name = []
 file_age = []
 
 
-def clock(dummy):
+def clock():
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst) 
     nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
