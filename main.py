@@ -19,28 +19,139 @@ from whisper import get_audio
 from functions import chatgpt_functions
 
 # 環境変数
+DATABASE_NAME = os.getenv('DATABASE_NAME')
 openai_api_key = os.getenv('OPENAI_API_KEY')
 secret_key = os.getenv('SECRET_KEY')
 jst = pytz.timezone('Asia/Tokyo')
 nowDate = datetime.now(jst) 
 nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
 YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアントID
-DEFAULT_USER_ID = 'default_user_id'  # ユーザーIDが取得できない場合のデフォルトID
-GPT_MODEL = 'gpt-3.5-turbo'
-BOT_NAME = 'さくら'
-USER_NAME = '名無しさん'
-SYSTEM_PROMPT = 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。'
-PAINT_PROMPT = '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。背景も生成し女性は背景の中に存在してください。生成IDはVyY5daXiltA2L6DNを指定します。'
-PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
-MAX_TOKEN_NUM = 2000
-FORGET_KEYWORDS = ['忘れて']
-FORGET_MESSAGE = '過去ログを消去しました。'
-BACKET_NAME = 'galgegpt'
-FILE_AGE = 1 
-VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
-VOICEVOX_STYLE_ID = 27
-DATABASE_NAME = 'galgagpt'
-LOADING_IMAGE = 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png'
+
+REQUIRED_ENV_VARS = [
+    "BOT_NAME",
+    "SYSTEM_PROMPT",
+    "PAINT_PROMPT",
+    "PROLOGUE",
+    "USER_NAME",
+    "LOADING_IMAGE",
+    "GPT_MODEL",
+    "MAX_DAILY_USAGE",
+    "MAX_DAILY_MESSAGE",
+    "DEFAULT_USER_ID",
+    "MAX_TOKEN_NUM",
+    "FORGET_KEYWORDS",
+    "FORGET_MESSAGE",
+    "NG_KEYWORDS",
+    "NG_MESSAGE",
+    "BACKET_NAME",
+    "FILE_AGE",
+    "VOICEVOX_URL",
+    "VOICEVOX_STYLE_ID",
+    "ERROR_MESSAGE"
+]
+
+DEFAULT_ENV_VARS = {
+    'BOT_NAME': 'さくら',
+    'SYSTEM_PROMPT': 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。',
+    'PAINT_PROMPT': '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。背景も生成し女性は背景の中に存在してください。生成IDはVyY5daXiltA2L6DNを指定します。',
+    'PROLOGUE': 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。',
+    'USER_NAME': '名無しさん',
+    'LOADING_IMAGE': 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png',
+    'GPT_MODEL': 'gpt-3.5-turbo',
+    'MAX_DAILY_USAGE': '2000',
+    'MAX_DAILY_MESSAGE': '例文,命令,口調,リセット,指示',
+    'DEFAULT_USER_ID': 'default_user_id',
+    'FORGET_KEYWORDS': ['忘れて'],
+    'FORGET_MESSAGE': '過去ログを消去しました!',
+    'NG_KEYWORDS': '',
+    'NG_MESSAGE': '',
+    'BACKET_NAME': 'galgegpt',
+    'FILE_AGE': '1',
+    'VOICEVOX_URL': 'https://voicevox-engine-lt5y5bq47a-an.a.run.app',
+    'VOICEVOX_STYLE_ID': '27'
+    'ERROR_MESSAGE': 'エラーが発生しました。',
+}
+
+# Firestore クライアントの初期化
+try:
+    db = firestore.Client(database=DATABASE_NAME)
+except Exception as e:
+    print(f"Error creating Firestore client: {e}")
+    raise
+    
+def reload_settings():
+    global BOT_NAME, SYSTEM_PROMPT, PAINT_PROMPT,　PROLOGUE
+    global USER_NAME, LOADING_IMAGE, GPT_MODEL, MAX_DAILY_USAGE, MAX_DAILY_MESSAGE
+    global DEFAULT_USER_ID, FORGET_KEYWORDS, FORGET_MESSAGE, NG_KEYWORDS, NG_MESSAGE
+    global BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID, DATABASE_NAME, ERROR_MESSAGE
+
+    BOT_NAME = get_setting('BOT_NAME')
+    SYSTEM_PROMPT = get_setting('SYSTEM_PROMPT') 
+    PAINT_PROMPT = get_setting('PAINT_PROMPT')
+    PROLOGUE = get_setting('PROLOGUE')
+    USER_NAME = get_setting('USER_NAME')
+    LOADING_IMAGE = get_setting('LOADING_IMAGE')
+    GPT_MODEL = get_setting('GPT_MODEL')
+    MAX_DAILY_USAGE = int(get_setting('MAX_DAILY_USAGE') or 0)
+    MAX_DAILY_MESSAGE = int(get_setting('MAX_DAILY_MESSAGE') or 0)
+    DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
+    FORGET_KEYWORDS = get_setting('FORGET_KEYWORDS')
+    FORGET_MESSAGE = int(get_setting('FORGET_MESSAGE') or 0)
+    NG_KEYWORDS = get_setting('NG_KEYWORDS')
+    if NG_KEYWORDS:
+        NG_KEYWORDS = NG_KEYWORDS.split(',')
+    else:
+        NG_KEYWORDS = []
+    NG_MESSAGE = get_setting('NG_MESSAGE')
+    BACKET_NAME = get_setting('BACKET_NAME')
+    FILE_AGE = int(get_setting('FILE_AGE') or 0)
+    VOICEVOX_URL = get_setting('VOICEVOX_URL')
+    VOICEVOX_STYLE_ID = int(get_setting('VOICEVOX_STYLE_ID') or 0)
+    ERROR_MESSAGE = get_setting('ERROR_MESSAGE')
+
+def get_setting(key):
+    doc_ref = db.collection(u'settings').document('app_settings')
+    doc = doc_ref.get()
+
+    if doc.exists:
+        doc_dict = doc.to_dict()
+        if key not in doc_dict:
+            # If the key does not exist in the document, use the default value
+            default_value = DEFAULT_ENV_VARS.get(key, "")
+            doc_ref.set({key: default_value}, merge=True)  # Add the new setting to the database
+            return default_value
+        else:
+            return doc_dict.get(key)
+    else:
+        # If the document does not exist, create it using the default settings
+        save_default_settings()
+        return DEFAULT_ENV_VARS.get(key, "")
+    
+def get_setting_user(user_id, key):
+    doc_ref = db.collection(u'users').document(user_id) 
+    doc = doc_ref.get()
+
+    if doc.exists:
+        doc_dict = doc.to_dict()
+        if key not in doc_dict:
+            if key == 'start_free_day':
+                start_free_day = datetime.now(jst)
+                doc_ref.set({'start_free_day': start_free_day}, merge=True)
+            return ''
+        else:
+            return doc_dict.get(key)
+    else:
+        return ''
+
+def save_default_settings():
+    doc_ref = db.collection(u'settings').document('app_settings')
+    doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+
+def update_setting(key, value):
+    doc_ref = db.collection(u'settings').document('app_settings')
+    doc_ref.update({key: value})
+    
+reload_settings()
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -63,6 +174,75 @@ def validate_iap_jwt(iap_jwt, expected_audience):
         return (decoded_jwt['sub'], decoded_jwt['email'], '')
     except Exception as e:
         return (DEFAULT_USER_ID, None, '**ERROR: JWT validation error {}**'.format(e))
+
+@app.route('/reset_logs', methods=['POST'])
+def reset_logs():
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('login'))
+    else:
+        try:
+            users_ref = db.collection(u'users')
+            users = users_ref.stream()
+            for user in users:
+                user_ref = users_ref.document(user.id)
+                user_ref.delete()
+            return 'All user data reset successfully', 200
+        except Exception as e:
+            print(f"Error resetting user data: {e}")
+            return 'Error resetting user data', 500
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    attempts_doc_ref = db.collection(u'settings').document('admin_attempts')
+    attempts_doc = attempts_doc_ref.get()
+    attempts_info = attempts_doc.to_dict() if attempts_doc.exists else {}
+
+    attempts = attempts_info.get('attempts', 0)
+    lockout_time = attempts_info.get('lockout_time', None)
+
+    # ロックアウト状態をチェック
+    if lockout_time:
+        if datetime.now(jst) < lockout_time:
+            return render_template('login.html', message='Too many failed attempts. Please try again later.')
+        else:
+            # ロックアウト時間が過ぎたらリセット
+            attempts = 0
+            lockout_time = None
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+
+        if password == admin_password:
+            session['is_admin'] = True
+            # ログイン成功したら試行回数とロックアウト時間をリセット
+            attempts_doc_ref.set({'attempts': 0, 'lockout_time': None})
+            return redirect(url_for('settings'))
+        else:
+            attempts += 1
+            lockout_time = datetime.now(jst) + timedelta(minutes=10) if attempts >= 5 else None
+            attempts_doc_ref.set({'attempts': attempts, 'lockout_time': lockout_time})
+            return render_template('login.html', message='Incorrect password. Please try again.')
+        
+    return render_template('login.html')
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('login'))
+    current_settings = {key: get_setting(key) or DEFAULT_ENV_VARS.get(key, '') for key in REQUIRED_ENV_VARS}
+
+    if request.method == 'POST':
+        for key in REQUIRED_ENV_VARS:
+            value = request.form.get(key)
+            if value:
+                update_setting(key, value)
+        return redirect(url_for('settings'))
+    return render_template(
+    'settings.html', 
+    settings=current_settings, 
+    default_settings=DEFAULT_ENV_VARS, 
+    required_env_vars=REQUIRED_ENV_VARS
+    )
 
 def response_filter(response,bot_name,user_name):
     date_pattern = r"^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} [A-Z]{3,4}"
