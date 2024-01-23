@@ -24,7 +24,7 @@ def clock(dummy):
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst) 
     nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
-    return nowDateStr
+    return "SYSTEM:現在時刻は" + nowDateStr + "です。"
 
 def scraping(links):
     contents = []
@@ -183,12 +183,12 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                     set_username_called = True
                     arguments = json.loads(function_call.arguments)
                     bot_reply, username = set_username(arguments["username"])
-                    i_messages_for_api.append({"role": "user", "content": bot_reply})
+                    i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 elif function_call.name == "clock" and not clock_called:
                     clock_called = True
                     bot_reply, _ = clock()
-                    i_messages_for_api.append({"role": "user", "content": bot_reply})
+                    i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
                     return response.choices[0].message.content, public_url_original, username
