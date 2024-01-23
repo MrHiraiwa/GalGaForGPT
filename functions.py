@@ -75,42 +75,39 @@ def search_wikipedia(prompt):
 
 
 
-def scraping(links):
-    contents = []
+def scraping(link):
     contents = ""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36" ,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
     }
     
-    for link in links:
-        try:
-            response = requests.get(link, headers=headers, timeout=5)  # Use headers
-            response.raise_for_status()
-            response.encoding = response.apparent_encoding
-            html = response.text
-        except requests.RequestException:
-            html = "<html></html>"
-            
-        soup = BeautifulSoup(html, features="html.parser")
+    try:
+        response = requests.get(link, headers=headers, timeout=5)
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding  # または特定のエンコーディングを指定
+        html = response.text
+    except requests.RequestException as e:
+        return f"SYSTEM: リンクの読み込み中にエラーが発生しました: {e}"
 
-        # Remove all 'a' tags
-        for a in soup.findAll('a'):
-            a.decompose()
+    soup = BeautifulSoup(html, features="html.parser")
 
-        content = soup.select_one("article, .post, .content")
+    # Remove all 'a' tags
+    for a in soup.findAll('a'):
+        a.decompose()
 
-        if content is None or content.text.strip() == "":
-            content = soup.select_one("body")
+    content = soup.select_one("article, .post, .content")
 
-        if content is not None:
-            text = ' '.join(content.text.split()).replace("。 ", "。\n").replace("! ", "!\n").replace("? ", "?\n").strip()
-            contents.append(text)
+    if content is None or content.text.strip() == "":
+        content = soup.select_one("body")
 
-            # 結果を1000文字に切り詰める
+    if content is not None:
+        contents = ' '.join(content.text.split()).replace("。 ", "。\n").replace("! ", "!\n").replace("? ", "?\n").strip()
+
+        # 結果を1000文字に切り詰める
         if len(contents) > 1000:
             contents = contents[:1000] + "..."
-    print(f"contents: {contents}")
-    return f"SYSTEM:以下は{links}の読み込み結果です。\n" + contents
+
+    return f"SYSTEM:以下は{link}の読み込み結果です。\n" + contents
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
