@@ -16,6 +16,13 @@ document.getElementById("voiceToggleButton").addEventListener("click", function(
     updateVoiceButtonLabel(); // ボタンのラベル更新
 });
 
+document.getElementById("userInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
 // 音声のオン・オフ状態に応じてボタンのラベルを更新する関数
 function updateVoiceButtonLabel() {
     const buttonLabel = voice_onoff ? "音声オン" : "音声オフ";
@@ -120,7 +127,7 @@ function setUserMessage(messageDiv, message, isUser) {
             messageDiv.textContent += fullMessage.charAt(i);
             i++;
             chatBox.scrollTop = chatBox.scrollHeight;
-            setTimeout(typeWriter, 100);
+            setTimeout(typeWriter, 50);
         }
     }
 
@@ -137,7 +144,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
             messageDiv.textContent += fullMessage.charAt(i);
             chatBox.scrollTop = chatBox.scrollHeight;
             i++;
-            setTimeout(typeWriter, 100);
+            setTimeout(typeWriter, 50);
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
@@ -157,7 +164,12 @@ function addBlankMessage(chatBox) {
 }
 
 window.onload = function() {
-    changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
+    fetch('/get_loading_image')
+    .then(response => response.json())
+    .then(data => {
+        const loading_image = data.loading_image;
+        changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
+    });
     const userId = window.preloadedUserId || 'default_user_id';
     fetchChatLog();
     fetch('/generate_image?user_id=' + userId)

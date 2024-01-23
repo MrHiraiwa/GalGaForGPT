@@ -16,7 +16,7 @@ import io
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
-from langchainagent import langchain_agent
+from functions import chatgpt_functions
 
 # 環境変数
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -30,7 +30,7 @@ GPT_MODEL = 'gpt-3.5-turbo'
 BOT_NAME = 'さくら'
 USER_NAME = '名無しさん'
 SYSTEM_PROMPT = 'あなたの名前はさくらです。あなたは有能な女性秘書をロールプレイングしてください。'
-PAINT_PROMPT = '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。生成IDはVyY5daXiltA2L6DNを指定します。'
+PAINT_PROMPT = '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。背景も生成し女性は背景の中に存在してください。生成IDはVyY5daXiltA2L6DNを指定します。'
 PROLOGUE = 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。'
 MAX_TOKEN_NUM = 2000
 FORGET_KEYWORDS = ['忘れて']
@@ -40,10 +40,13 @@ FILE_AGE = 1
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
 DATABASE_NAME = 'galgagpt'
+LOADING_IMAGE = 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
+
+gpt_client = OpenAI(api_key=openai_api_key)
 
 # Firestore クライアントの初期化
 try:
@@ -117,6 +120,7 @@ def texthook_handler():
         local_path = []
         user_name = USER_NAME
         recent_messages_str = ""
+        bot_reply = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
             recent_messages = user_data['messages'][-5:]
@@ -127,7 +131,8 @@ def texthook_handler():
                 'updated_date_string': nowDate,
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst),
-                'user_name': USER_NAME
+                'user_name': USER_NAME,
+                'last_image_url': ""
             }
             
         user_name = user_data['user_name']
@@ -146,31 +151,24 @@ def texthook_handler():
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
-        result, public_img_url, i_user_name = langchain_agent(langchain_prompt, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
-        result = "\n以下はユーザーの問い合わせに対する参考情報です。\n" + result
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(result)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
+        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
         while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
             user_data['messages'].pop(0)
 
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT + result}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
-        
-        response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers={'Authorization': f'Bearer {openai_api_key}'},
-            json={'model': GPT_MODEL, 'messages': messages_for_api},
-            timeout=50
-        )
+        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
 
-        if response.status_code == 200:
-            response_json = response.json()
-            bot_reply = response_json['choices'][0]['message']['content'].strip()
+        try:
+            bot_reply, public_img_url, i_user_name = chatgpt_functions(GPT_MODEL, messages_for_api, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
             bot_reply = response_filter(bot_reply, BOT_NAME, USER_NAME)
         
             if i_user_name:
                 user_name = i_user_name
+            if not public_img_url:
+                public_img_url = user_data['last_image_url']
+            
 
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
@@ -182,11 +180,12 @@ def texthook_handler():
             user_data['daily_usage'] += 1
             user_data['updated_date_string'] = nowDate
             user_data['user_name'] = user_name
+            user_data['last_image_url'] = public_img_url
             doc_ref.set(user_data, merge=True)
 
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
-        else:
-            print(f"Error with OpenAI API: {response.text}")
+        except Exception as e:
+            print(f"APIError with OpenAI API: {str(e)}")
             return jsonify({"error": "Unable to process your request"}), 500
     return update_in_transaction(db.transaction(), doc_ref)
 
@@ -246,20 +245,44 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
     except Exception as e:
         print(f"Failed to upload file: {e}")
         raise
-        
+
 @app.route('/generate_image', methods=['GET'])
 def generate_image():
     user_id = request.args.get('user_id', DEFAULT_USER_ID)
-    bucket_name = BACKET_NAME  # または適切なバケット名を設定
+    bucket_name = BACKET_NAME
+    last_access_date = ""
+    daily_usage = 0
+    last_image_url = ""
+    doc_ref = db.collection(u'users').document(user_id)
+    user_doc = doc_ref.get()
 
+    # Firestoreドキュメントが存在するかチェック
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+        last_access_date = user_data.get('updated_date_string')
+        last_image_url = user_data.get('last_image_url', None)
+        daily_usage = user_data.get('daily_usage', 0)
+    else:
+        # ドキュメントが存在しない場合、新しいデータを作成
+        user_data = {
+            'messages': [],
+            'updated_date_string': nowDateStr,
+            'daily_usage': 0,
+            'start_free_day': datetime.now(jst),
+            'user_name': USER_NAME,
+            'last_image_url': None
+        }
+
+    # 最終アクセスが今日の場合、前回のURLを返す
+    if 1 <= daily_usage and last_image_url:
+        return jsonify({"img_url": last_image_url})
+    # 新しい画像を生成
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
-    client = OpenAI(api_key=openai_api_key)  # APIキーを設定
-
     prompt = PAINT_PROMPT
 
     try:
-        response = client.images.generate(
+        response = gpt_client.images.generate(
             model="dall-e-3",
             prompt=prompt,
             size="1024x1024",
@@ -279,9 +302,20 @@ def generate_image():
 
         # 元のPNG画像をアップロード
         public_url_original = upload_blob(bucket_name, png_image, blob_path)
+
+        # 新しい画像URLと最終アクセス日時をFirestoreに保存
+        user_data['last_image_url'] = public_url_original
+        user_data['updated_date_string'] = nowDateStr
+        doc_ref.set(user_data, merge=True)
+
         return jsonify({"img_url": public_url_original})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/get_loading_image', methods=['GET'])
+def get_loading_image():
+    loading_image = LOADING_IMAGE
+    return jsonify({"loading_image": loading_image})
 
 
 @app.route('/get_username', methods=['GET'])
