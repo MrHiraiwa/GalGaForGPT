@@ -119,67 +119,82 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let words = message.split(' '); // スペースでメッセージを分割
-    let i = 0;
-    let j = 0;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
 
-    function typeWriter() {
-        if (j < words.length) {
-            if (isURL(words[j])) {
-                const a = document.createElement('a');
-                a.href = words[j];
-                a.textContent = words[j];
-                a.target = '_blank'; // 新しいタブでリンクを開く
-                messageDiv.appendChild(a);
-                messageDiv.appendChild(document.createTextNode(' ')); // スペースを追加
-                j++;
-                setTimeout(typeWriter, 50);
+    function createLinkElement(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url;
+        link.target = "_blank"; // 新しいタブでリンクを開く
+        return link;
+    }
+
+    function typeWriter(text, callback) {
+        let i = 0;
+        let interval = setInterval(() => {
+            if (i < text.length) {
+                messageDiv.textContent += text.charAt(i);
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight; // スクロール
             } else {
-                if (i < words[j].length) {
-                    messageDiv.textContent += words[j].charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 50);
-                } else {
-                    messageDiv.textContent += ' '; // 単語の後にスペースを追加
-                    i = 0;
-                    j++;
-                    setTimeout(typeWriter, 50);
-                }
+                clearInterval(interval);
+                callback(); // 次の部分の処理を開始
+            }
+        }, 50);
+    }
+
+    function processMessage(index) {
+        if (index < fullMessage.length) {
+            const part = fullMessage[index];
+            if (part.match(urlRegex)) {
+                messageDiv.appendChild(createLinkElement(part));
+                processMessage(index + 1); // 次の部分へ
+            } else {
+                typeWriter(part, () => processMessage(index + 1));
             }
         }
     }
 
-    typeWriter();
+    processMessage(0);
     messageDiv.className = 'message-animation';
 }
 
-function setBotMessage(messageDiv, message, isUser, callback) {
-    let words = message.split(' '); // スペースでメッセージを分割
-    let i = 0;
-    let j = 0;
 
-    function typeWriter() {
-        if (j < words.length) {
-            if (isURL(words[j])) {
-                const a = document.createElement('a');
-                a.href = words[j];
-                a.textContent = words[j];
-                a.target = '_blank'; // 新しいタブでリンクを開く
-                messageDiv.appendChild(a);
-                messageDiv.appendChild(document.createTextNode(' ')); // スペースを追加
-                j++;
-                setTimeout(typeWriter, 50);
+function setBotMessage(messageDiv, message, isUser, callback) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
+
+    function createLinkElement(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url;
+        link.target = "_blank"; // 新しいタブでリンクを開く
+        return link;
+    }
+
+    function typeWriter(text, callback) {
+        let i = 0;
+        let interval = setInterval(() => {
+            if (i < text.length) {
+                messageDiv.textContent += text.charAt(i);
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight; // スクロール
             } else {
-                if (i < words[j].length) {
-                    messageDiv.textContent += words[j].charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 50);
-                } else {
-                    messageDiv.textContent += ' '; // 単語の後にスペースを追加
-                    i = 0;
-                    j++;
-                    setTimeout(typeWriter, 50);
-                }
+                clearInterval(interval);
+                callback(); // 次の部分の処理を開始
+            }
+        }, 50);
+    }
+
+    function processMessage(index) {
+        if (index < fullMessage.length) {
+            const part = fullMessage[index];
+            if (part.match(urlRegex)) {
+                messageDiv.appendChild(createLinkElement(part));
+                processMessage(index + 1); // 次の部分へ
+            } else {
+                typeWriter(part, () => processMessage(index + 1));
             }
         } else {
             if (callback) {
@@ -188,19 +203,8 @@ function setBotMessage(messageDiv, message, isUser, callback) {
         }
     }
 
-    typeWriter();
+    processMessage(0);
     messageDiv.className = 'message-animation';
-}
-
-function isURL(str) {
-    // URLかどうかを判定するロジック
-    var pattern = new RegExp('^(https?:\\/\\/)?'+ // プロトコル
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // ドメイン名
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR IP (v4) アドレス
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // ポートとパス
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // クエリ文字列
-        '(\\#[-a-z\\d_]*)?$','i'); // フラグメントロケータ
-    return pattern.test(str);
 }
 
 
