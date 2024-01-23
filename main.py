@@ -314,7 +314,7 @@ def generate_image():
 
 @app.route('/get_loading_image', methods=['GET'])
 def get_loading_image():
-        loading_image = LOADING_IMAGE  
+    loading_image = LOADING_IMAGE
     return jsonify({"loading_image": loading_image})
 
 
