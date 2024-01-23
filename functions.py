@@ -44,7 +44,18 @@ def get_googlesearch(words, num=3, start_index=1, search_lang='lang_ja'):
     response = requests.get(base_url, params=params)
     response.raise_for_status()
 
-    return "SYSTEM:Webページを検索しました。\n" + response.json()
+    search_results = response.json()
+
+    # 検索結果を文字列に整形
+    formatted_results = ""
+    for item in search_results.get("items", []):
+        title = item.get("title")
+        link = item.get("link")
+        snippet = item.get("snippet")
+        formatted_results += f"タイトル: {title}\nリンク: {link}\n概要: {snippet}\n\n"
+
+    return "SYSTEM:Webページを検索しました。\n" + formatted_results
+
 
 def search_wikipedia(prompt):
     try:
