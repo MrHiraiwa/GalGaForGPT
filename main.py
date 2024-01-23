@@ -273,7 +273,7 @@ def generate_image():
         }
 
     # 最終アクセスが今日の場合、前回のURLを返す
-    if 1 =< daily_usage and last_image_url:
+    if 1 <= daily_usage and last_image_url:
         return jsonify({"img_url": last_image_url})
     # 新しい画像を生成
     filename = str(uuid.uuid4())
