@@ -40,6 +40,7 @@ FILE_AGE = 1
 VOICEVOX_URL = 'https://voicevox-engine-lt5y5bq47a-an.a.run.app'
 VOICEVOX_STYLE_ID = 27
 DATABASE_NAME = 'galgagpt'
+LOADING_IMAGE　= 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png'
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
@@ -310,6 +311,12 @@ def generate_image():
         return jsonify({"img_url": public_url_original})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/get_loading_image', methods=['GET'])
+def get_loading_image():
+        loading_image = LOADING_IMAGE  
+    return jsonify({"loading_image": loading_image})
+
 
 @app.route('/get_username', methods=['GET'])
 def get_username():
