@@ -173,6 +173,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
 
     set_username_called = False
     clock_called = False
+    generate_image_called = False
 
     while attempt < max_attempts:
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
@@ -189,6 +190,12 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 elif function_call.name == "clock" and not clock_called:
                     clock_called = True
                     bot_reply = clock()
+                    i_messages_for_api.append({"role": "assistant", "content": bot_reply})
+                    attempt += 1
+                elif function_call.name == "generate_image" and not generate_image_called:
+                    generate_image_called = True
+                    arguments = json.loads(function_call.arguments)
+                    bot_reply, username = generate_image(arguments["prompt"])
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
