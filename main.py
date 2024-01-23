@@ -273,12 +273,6 @@ def url_filter(text):
     text_without_urls = re.sub(url_pattern, '', text)
     return text_without_urls
 
-# 関数の使用例
-test_text = "これはテストメッセージです。ウェブサイトを訪れてください: https://example.com ありがとう！"
-result = remove_urls(test_text)
-print(result)
-
-
 @app.route('/', methods=['GET'])
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
