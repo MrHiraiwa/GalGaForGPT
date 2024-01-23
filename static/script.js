@@ -164,7 +164,12 @@ function addBlankMessage(chatBox) {
 }
 
 window.onload = function() {
-    changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
+    fetch('/get_loading_image')
+    .then(response => response.json())
+    .then(data => {
+        const loading_image = data.loading_image;
+        changeBackgroundImage("https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png");
+    });
     const userId = window.preloadedUserId || 'default_user_id';
     fetchChatLog();
     fetch('/generate_image?user_id=' + userId)
