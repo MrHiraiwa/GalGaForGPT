@@ -81,8 +81,7 @@ def set_bucket_lifecycle(bucket_name, age):
     
     bucket.lifecycle_rules = [rule]
     bucket.patch()
-
-    #print(f"Lifecycle rule set for bucket {bucket_name}.")
+    return
 
 def bucket_exists(bucket_name):
     """Check if a bucket exists."""
@@ -115,10 +114,8 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
-    print(f"blob_path: {blob_path}")
     client = OpenAI()
     prompt = paint_prompt + "\n" + prompt
-    print(f"prompt: {prompt}")
     try:
         response = client.images.generate(
             model="dall-e-3",
@@ -128,8 +125,6 @@ def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
             n=1,
         )
         image_result = response.data[0].url
-        print(f"image_result: {image_result}")
-        print(f"bucket_name: {bucket_name}, file_age:{file_age}")
         if bucket_exists(bucket_name):
             set_bucket_lifecycle(bucket_name, file_age)
         else:
@@ -208,6 +203,12 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                     generate_image_called = True
                     arguments = json.loads(function_call.arguments)
                     bot_reply, public_url_original = generate_image(paint_prompt, arguments["prompt"], user_id, bucket_name, file_age)
+                    i_messages_for_api.append({"role": "assistant", "content": bot_reply})
+                    attempt += 1
+                elif function_call.name == "search_wikipedia" and not search_wikipedia_called:
+                    search_wikipedia_called = True
+                    arguments = json.loads(function_call.arguments)
+                    bot_reply = search_wikipedia(arguments["prompt"])
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
