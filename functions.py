@@ -162,7 +162,6 @@ def run_conversation_f(GPT_MODEL, messages):
         return None  # エラー時には None を返す
 
 def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FILE_AGE=None, PAINT_PROMPT="", max_attempts=3):
-    global i_messages_for_api
     public_url_original = None
     user_id = USER_ID
     bucket_name = BUCKET_NAME
@@ -170,27 +169,41 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     paint_prompt = PAINT_PROMPT
     username = ""
     attempt = 0
-    i_messages_for_api = messages_for_api
+    i_messages_for_api = messages_for_api.copy()
+
+    set_username_called = False
+    clock_called = False
 
     while attempt < max_attempts:
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
-        print(f"response: {response}")
         if response:
-            bot_reply = response.choices[0].message.content
             function_call = response.choices[0].message.function_call
-            if function_call and function_call.name == "set_UserName":
-                arguments = json.loads(function_call.arguments)
-                bot_reply, username = set_username(arguments["username"])
-                # ここで再帰的に chatgpt_functions を呼び出すか、messages_for_api を更新して再度 run_conversation を呼び出す
-                i_messages_for_api.append({"role": "assistant", "content": bot_reply})
-                attempt += 1
+            if function_call:
+                if function_call.name == "set_UserName" and not set_username_called:
+                    set_username_called = True
+                    arguments = json.loads(function_call.arguments)
+                    bot_reply, username = set_username(arguments["username"])
+                    i_messages_for_api.append({"role": "user", "content": bot_reply})
+                    attempt += 1
+                elif function_call.name == "clock" and not clock_called:
+                    clock_called = True
+                    bot_reply, _ = clock()
+                    i_messages_for_api.append({"role": "user", "content": bot_reply})
+                    attempt += 1
+                else:
+                    return response.choices[0].message.content, public_url_original, username
             else:
-                return bot_reply, public_url_original, username
+                return response.choices[0].message.content, public_url_original, username
         else:
             return "An error occurred while processing the question", public_url_original, username
-    response = run_conversation(GPT_MODEL, messages_for_api)
-    if response:
-        bot_reply = response.choices[0].message.content
-    else:
-        bot_reply = "An error occurred while processing the question"
+
+    if set_username_called or clock_called:
+        # いずれかの機能が呼び出された場合、functions機能を無効化して会話を続行
+        response = run_conversation(GPT_MODEL, i_messages_for_api)
+        if response:
+            bot_reply = response.choices[0].message.content
+        else:
+            bot_reply = "An error occurred while processing the question"
+    
     return bot_reply, public_url_original, username
+
