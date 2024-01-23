@@ -163,17 +163,16 @@ function setUserMessage(messageDiv, message, isUser) {
 
 function setBotMessage(messageDiv, message, isUser, callback) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
 
     function createLinkElement(url) {
         const link = document.createElement('a');
         link.href = url;
-        link.textContent = url;
+        link.textContent = url; // リンクのテキストを設定
         link.target = "_blank"; // 新しいタブでリンクを開く
         return link;
     }
 
-    function typeWriter(text, callback) {
+    function typeWriter(text, index, callback) {
         let i = 0;
         let interval = setInterval(() => {
             if (i < text.length) {
@@ -182,19 +181,19 @@ function setBotMessage(messageDiv, message, isUser, callback) {
                 chatBox.scrollTop = chatBox.scrollHeight; // スクロール
             } else {
                 clearInterval(interval);
-                callback(); // 次の部分の処理を開始
+                processMessage(index + 1, callback); // 次の部分の処理を開始
             }
         }, 50);
     }
 
-    function processMessage(index) {
-        if (index < fullMessage.length) {
-            const part = fullMessage[index];
+    function processMessage(index, callback) {
+        if (index < message.length) {
+            const part = message[index];
             if (part.match(urlRegex)) {
-                messageDiv.appendChild(createLinkElement(part));
-                processMessage(index + 1); // 次の部分へ
+                messageDiv.appendChild(createLinkElement(part)); // リンク要素を追加
+                processMessage(index + 1, callback); // 次の部分へ
             } else {
-                typeWriter(part, () => processMessage(index + 1));
+                typeWriter(part, index, callback);
             }
         } else {
             if (callback) {
@@ -203,7 +202,8 @@ function setBotMessage(messageDiv, message, isUser, callback) {
         }
     }
 
-    processMessage(0);
+    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
+    processMessage(0, callback);
     messageDiv.className = 'message-animation';
 }
 
