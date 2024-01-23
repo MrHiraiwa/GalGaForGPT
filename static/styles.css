@@ -28,7 +28,7 @@ body {
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
-  font-size: clamp(15px, 1vw, 25px);
+  font-size: clamp(20px, 1vw, 30px);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -36,8 +36,8 @@ body {
 
 #chatBox {
   margin: 10px 0;
-  min-height: calc(6 * 1.2em * 1.5);
-  max-height: calc(4 * 1.2em * 1.5);
+  min-height: calc(6 * 1.5em * 1.5);
+  max-height: calc(4 * 1.5em * 1.5);
   width: 100%;
   overflow-y: scroll;
   border: 1px solid #ccc;
