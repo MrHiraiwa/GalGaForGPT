@@ -115,8 +115,10 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
+    print(f"blob_path: {blob_path}")
     client = OpenAI()
     prompt = paint_prompt + "\n" + prompt
+    print(f"prompt: {prompt}")
     try:
         response = client.images.generate(
             model="dall-e-3",
@@ -127,23 +129,21 @@ def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
         )
         image_result = response.data[0].url
         print(f"image_result: {image_result}")
+        print(f"bucket_name: {bucket_name}, file_age:{file_age}")
+        if bucket_exists(bucket_name):
+            set_bucket_lifecycle(bucket_name, file_age)
+        else:
+            print(f"Bucket {bucket_name} does not exist.")
+            return "SYSTEM:バケットが存在しません。"
+
+        # PNG画像をダウンロード
+        png_image = download_image(image_result)
+
+        # 元のPNG画像をアップロード
+        public_url_original = upload_blob(bucket_name, png_image, blob_path)
+        return "SYSTEM:風景を変更しました。", public_url_original
     except Exception as e:
-        return e
-
-    if bucket_exists(bucket_name):
-        set_bucket_lifecycle(bucket_name, file_age)
-    else:
-        print(f"Bucket {bucket_name} does not exist.")
-        return 'OK'
-
-    # PNG画像をダウンロード
-    png_image = download_image(image_result)
-
-    # 元のPNG画像をアップロード
-    public_url_original = upload_blob(bucket_name, png_image, blob_path)
-
-
-    return "SYSTEM:風景を変更しました。", public_url_original
+        return f"SYSTEM: 画像生成にエラーが発生しました。{e}"
 
 def set_username(prompt):
     username = prompt
