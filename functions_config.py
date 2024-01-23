@@ -27,7 +27,7 @@ functions = [
         # 関数の名称
         "name": "generate_image",
         # 関数の機能説明
-        "description": "Whenever a user mentions a change in location or emotion, you should trigger a function call. if the user clearly names a new location or describes a change in your emotional state, the function to update the location or emotional context should be activated. Look for explicit phrases like 'You are now at [location]' or 'you feel [emotion]' to initiate the relevant function.",
+        "description": "When a topic comes up about places or emotions, it generates your emotions and scenery from a single sentence.",
         # 関数のパラメータ
         "parameters": {
             "type": "object",
@@ -36,7 +36,7 @@ functions = [
                 "prompt": {
                     "type": "string",
                     # 引数の説明
-                    "description": "画像生成プロンプト"
+                    "description": "景色や感情"
                 }
             }
         }
