@@ -243,23 +243,21 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 @app.route('/generate_image', methods=['GET'])
 def generate_image():
     user_id = request.args.get('user_id', DEFAULT_USER_ID)
+    bucket_name = BACKET_NAME
+
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
-    now = datetime.now(jst)
-    nowDateStr = now.strftime('%Y-%m-%d')
 
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        last_updated_date = datetime.strptime(user_data['updated_date_string'], '%Y-%m-%d %H:%M:%S %Z').date()
-        last_img_url = user_data.get('last_img_url', None)
+        last_access_date = user_data.get('updated_date_string')
+        last_image_url = user_data.get('last_image_url')
 
-        # 同じ日に2回目のアクセスの場合は前回の画像URLを返す
-        if last_updated_date == now.date() and last_img_url is not None:
-            return jsonify({"img_url": last_img_url})
-    else:
-        user_data = {'messages': [], 'updated_date_string': nowDateStr, 'daily_usage': 0, 'start_free_day': now, 'user_name': USER_NAME, 'last_img_url': None}
+        # 最終アクセスが今日の場合、前回のURLを返す
+        if last_access_date == nowDateStr:
+            return jsonify({"img_url": last_image_url})
 
-    # 画像生成の処理
+    # 新しい画像を生成
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
     prompt = PAINT_PROMPT
@@ -286,9 +284,9 @@ def generate_image():
         # 元のPNG画像をアップロード
         public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
-        # Firestore に最終アクセス日時と画像URLを保存
+        # 新しい画像URLと最終アクセス日時をFirestoreに保存
+        user_data['last_image_url'] = public_url_original
         user_data['updated_date_string'] = nowDateStr
-        user_data['last_img_url'] = public_url_original
         doc_ref.set(user_data, merge=True)
 
         return jsonify({"img_url": public_url_original})
