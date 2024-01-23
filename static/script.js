@@ -49,14 +49,38 @@ function changeBackgroundImage(img_url) {
 
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
     messageDiv.className = 'message-animation';
+
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+|\n)/g;
+    let parts = message.split(urlRegex);
+
+    parts.forEach(part => {
+        if (part.match(urlRegex)) {
+            // URLの場合はリンクとして追加
+            const link = document.createElement('a');
+            link.href = part;
+            link.textContent = part;
+            link.target = '_blank';
+            messageDiv.appendChild(link);
+        } else {
+            // 非URLの場合はテキストとして処理
+            // 改行を処理
+            const lines = part.split('\n');
+            lines.forEach((line, index) => {
+                messageDiv.appendChild(document.createTextNode(line));
+                if (index < lines.length - 1) {
+                    messageDiv.appendChild(document.createElement('br'));
+                }
+            });
+        }
+    });
+
     chatBox.appendChild(messageDiv);
 
     // スムーズスクロールの実行
     messageDiv.scrollIntoView({ behavior: 'smooth' });
-
 }
+
 
 function sendMessage() {
     var message = document.getElementById("userInput").value;
