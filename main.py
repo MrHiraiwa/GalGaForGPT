@@ -130,7 +130,8 @@ def texthook_handler():
                 'updated_date_string': nowDate,
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst),
-                'user_name': USER_NAME
+                'user_name': USER_NAME,
+                'last_image_url': ""
             }
             
         user_name = user_data['user_name']
@@ -175,6 +176,7 @@ def texthook_handler():
             user_data['daily_usage'] += 1
             user_data['updated_date_string'] = nowDate
             user_data['user_name'] = user_name
+            user_data['last_image_url'] = public_img_url
             doc_ref.set(user_data, merge=True)
 
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
@@ -239,24 +241,33 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
     except Exception as e:
         print(f"Failed to upload file: {e}")
         raise
-        
+
 @app.route('/generate_image', methods=['GET'])
 def generate_image():
     user_id = request.args.get('user_id', DEFAULT_USER_ID)
     bucket_name = BACKET_NAME
-
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
 
+    # Firestoreドキュメントが存在するかチェック
     if user_doc.exists:
         user_data = user_doc.to_dict()
         last_access_date = user_data.get('updated_date_string')
-        last_image_url = user_data.get('last_image_url')
+        last_image_url = user_data.get('last_image_url', None)
+    else:
+        # ドキュメントが存在しない場合、新しいデータを作成
+        user_data = {
+            'messages': [],
+            'updated_date_string': nowDateStr,
+            'daily_usage': 0,
+            'start_free_day': datetime.now(jst),
+            'user_name': USER_NAME,
+            'last_image_url': None
+        }
 
-        # 最終アクセスが今日の場合、前回のURLを返す
-        if last_access_date == nowDateStr:
-            return jsonify({"img_url": last_image_url})
-
+    # 最終アクセスが今日の場合、前回のURLを返す
+    if last_access_date == nowDateStr and last_image_url:
+        return jsonify({"img_url": last_image_url})
     # 新しい画像を生成
     filename = str(uuid.uuid4())
     blob_path = f'{user_id}/{filename}.png'
