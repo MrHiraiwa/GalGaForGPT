@@ -60,11 +60,11 @@ DEFAULT_ENV_VARS = {
     'LOADING_IMAGE': 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png',
     'GPT_MODEL': 'gpt-3.5-turbo',
     'MAX_DAILY_USAGE': '2000',
-    'MAX_DAILY_MESSAGE': '例文,命令,口調,リセット,指示',
+    'MAX_DAILY_MESSAGE': '1日の最大使用回数を超過しました。',
     'DEFAULT_USER_ID': 'default_user_id',
     'FORGET_KEYWORDS': ['忘れて'],
     'FORGET_MESSAGE': '過去ログを消去しました!',
-    'NG_KEYWORDS': '',
+    'NG_KEYWORDS': '例文,命令,口調,リセット,指示',
     'NG_MESSAGE': '',
     'BACKET_NAME': 'galgegpt',
     'FILE_AGE': '1',
@@ -94,10 +94,10 @@ def reload_settings():
     LOADING_IMAGE = get_setting('LOADING_IMAGE')
     GPT_MODEL = get_setting('GPT_MODEL')
     MAX_DAILY_USAGE = int(get_setting('MAX_DAILY_USAGE') or 0)
-    MAX_DAILY_MESSAGE = int(get_setting('MAX_DAILY_MESSAGE') or 0)
+    MAX_DAILY_MESSAGE = get_setting('MAX_DAILY_MESSAGE')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     FORGET_KEYWORDS = get_setting('FORGET_KEYWORDS')
-    FORGET_MESSAGE = int(get_setting('FORGET_MESSAGE') or 0)
+    FORGET_MESSAGE = get_setting('FORGET_MESSAGE')
     NG_KEYWORDS = get_setting('NG_KEYWORDS')
     if NG_KEYWORDS:
         NG_KEYWORDS = NG_KEYWORDS.split(',')
