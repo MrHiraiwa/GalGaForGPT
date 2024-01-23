@@ -165,6 +165,9 @@ def texthook_handler():
         
             if i_user_name:
                 user_name = i_user_name
+            if not public_img_url:
+                public_img_url = user_data['last_image_url']
+            
 
             if voice_onoff:
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
