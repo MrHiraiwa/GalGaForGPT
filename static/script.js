@@ -49,14 +49,38 @@ function changeBackgroundImage(img_url) {
 
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
     messageDiv.className = 'message-animation';
+    
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+)/g;
+    let parts = message.split(urlRegex);
+
+    parts.forEach(part => {
+        if (part.match(urlRegex)) {
+            // URLの場合はリンクとして追加
+            const link = document.createElement('a');
+            link.href = part;
+            link.textContent = part;
+            link.target = '_blank';
+            messageDiv.appendChild(link);
+        } else {
+            // 非URLの場合はテキストとして処理
+            // 改行を処理
+            const lines = part.split('\n');
+            lines.forEach((line, index) => {
+                messageDiv.appendChild(document.createTextNode(line));
+                if (index < lines.length - 1) {
+                    messageDiv.appendChild(document.createElement('br'));
+                }
+            });
+        }
+    });
+
     chatBox.appendChild(messageDiv);
 
     // スムーズスクロールの実行
     messageDiv.scrollIntoView({ behavior: 'smooth' });
-
 }
+
 
 function sendMessage() {
     var message = document.getElementById("userInput").value;
@@ -119,42 +143,100 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let fullMessage = message;
-    let i = 0;
-    
-    function typeWriter() {
-        if (i < fullMessage.length) {
-            messageDiv.textContent += fullMessage.charAt(i);
-            i++;
-            chatBox.scrollTop = chatBox.scrollHeight;
-            setTimeout(typeWriter, 50);
-        }
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
+
+    function createLinkElement(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url;
+        link.target = "_blank"; // 新しいタブでリンクを開く
+        return link;
     }
 
-    typeWriter();
-    messageDiv.className = 'message-animation';
-}
+    function typeWriter(text, callback) {
+        let i = 0;
+        let interval = setInterval(() => {
+            if (i < text.length) {
+                messageDiv.textContent += text.charAt(i);
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight; // スクロール
+            } else {
+                clearInterval(interval);
+                callback(); // 次の部分の処理を開始
+            }
+        }, 50);
+    }
 
-function setBotMessage(messageDiv, message, isUser, callback) {
-    let fullMessage = message;
-    let i = 0;
-
-    function typeWriter() {
-        if (i < fullMessage.length) {
-            messageDiv.textContent += fullMessage.charAt(i);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            i++;
-            setTimeout(typeWriter, 50);
-        } else {
-            if (callback) {
-                callback(); // コールバック関数を実行
+    function processMessage(index) {
+        if (index < fullMessage.length) {
+            const part = fullMessage[index];
+            if (part.match(urlRegex)) {
+                messageDiv.appendChild(createLinkElement(part));
+                processMessage(index + 1); // 次の部分へ
+            } else {
+                typeWriter(part, () => processMessage(index + 1));
             }
         }
     }
 
-    typeWriter();
+    processMessage(0);
     messageDiv.className = 'message-animation';
 }
+
+
+function setBotMessage(messageDiv, message, isUser, callback) {
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+|\n)/g;
+
+    function createLinkElement(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url;
+        link.target = "_blank";
+        return link;
+    }
+
+    function typeWriter(text, callback) {
+        let i = 0;
+        let interval = setInterval(() => {
+            if (i < text.length) {
+                if (text.charAt(i) === '\n') {
+                    messageDiv.appendChild(document.createElement('br'));
+                } else {
+                    const textNode = document.createTextNode(text.charAt(i));
+                    messageDiv.appendChild(textNode);
+                }
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } else {
+                clearInterval(interval);
+                callback();
+            }
+        }, 50);
+    }
+
+    function processMessage(parts, index) {
+        if (index < parts.length) {
+            const part = parts[index];
+            if (urlRegex.test(part) && part !== '\n') {
+                messageDiv.appendChild(createLinkElement(part));
+                processMessage(parts, index + 1);
+            } else {
+                typeWriter(part, () => processMessage(parts, index + 1));
+            }
+        } else {
+            if (callback) {
+                callback();
+            }
+        }
+    }
+
+    const parts = message.split(urlRegex);
+    processMessage(parts, 0);
+    messageDiv.className = 'message-animation';
+}
+
+
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
