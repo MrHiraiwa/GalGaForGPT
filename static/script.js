@@ -162,48 +162,49 @@ function setUserMessage(messageDiv, message, isUser) {
 
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    // URLを識別する改善された正規表現（英数字と一部の記号のみをURLの一部とみなす）
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+)/g;
 
     function createLinkElement(url) {
         const link = document.createElement('a');
         link.href = url;
-        link.textContent = url; // リンクのテキストを設定
-        link.target = "_blank"; // 新しいタブでリンクを開く
+        link.textContent = url;
+        link.target = "_blank";
         return link;
     }
 
-    function typeWriter(text, index, callback) {
+    function typeWriter(text, callback) {
         let i = 0;
         let interval = setInterval(() => {
             if (i < text.length) {
                 messageDiv.textContent += text.charAt(i);
                 i++;
-                chatBox.scrollTop = chatBox.scrollHeight; // スクロール
+                chatBox.scrollTop = chatBox.scrollHeight;
             } else {
                 clearInterval(interval);
-                processMessage(index + 1, callback); // 次の部分の処理を開始
+                callback();
             }
         }, 50);
     }
 
-    function processMessage(index, callback) {
-        if (index < message.length) {
-            const part = message[index];
-            if (part.match(urlRegex)) {
-                messageDiv.appendChild(createLinkElement(part)); // リンク要素を追加
-                processMessage(index + 1, callback); // 次の部分へ
+    function processMessage(parts, index) {
+        if (index < parts.length) {
+            const part = parts[index];
+            if (urlRegex.test(part)) {
+                messageDiv.appendChild(createLinkElement(part));
+                processMessage(parts, index + 1);
             } else {
-                typeWriter(part, index, callback);
+                typeWriter(part, () => processMessage(parts, index + 1));
             }
         } else {
             if (callback) {
-                callback(); // コールバック関数を実行
+                callback();
             }
         }
     }
 
-    let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
-    processMessage(0, callback);
+    const parts = message.split(urlRegex);
+    processMessage(parts, 0);
     messageDiv.className = 'message-animation';
 }
 
