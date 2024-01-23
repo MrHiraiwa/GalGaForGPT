@@ -77,7 +77,7 @@ def search_wikipedia(prompt):
 
 def scraping(links):
     contents = []
-    summary = ""
+    contents = ""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36" ,
     }
@@ -108,9 +108,9 @@ def scraping(links):
 
             # 結果を1000文字に切り詰める
         if len(contents) > 1000:
-            summary = contents[:1000] + "..."
-            print(f"summary: {summary}")
-    return f"SYSTEM:以下は{links}の読み込み結果です。\n" + summary
+            contents = contents[:1000] + "..."
+        print(f"contents: {contents}")
+    return f"SYSTEM:以下は{links}の読み込み結果です。\n" + contents
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
