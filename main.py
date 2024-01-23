@@ -264,6 +264,21 @@ def response_filter(response,bot_name,user_name):
     response = re.sub(dot_pattern, "", response).strip()
     return response
 
+
+def url_filter(text):
+    # URLを識別する正規表現パターン
+    url_pattern = r'https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&\'()*+,;=]+'
+    
+    # テキストからURLを削除
+    text_without_urls = re.sub(url_pattern, '', text)
+    return text_without_urls
+
+# 関数の使用例
+test_text = "これはテストメッセージです。ウェブサイトを訪れてください: https://example.com ありがとう！"
+result = remove_urls(test_text)
+print(result)
+
+
 @app.route('/', methods=['GET'])
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
@@ -354,7 +369,8 @@ def texthook_handler():
             
 
             if voice_onoff:
-                public_url, local_path = put_audio_voicevox(user_id, bot_reply, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
+                bot_reply_v = url_filter(bot_reply)
+                public_url, local_path = put_audio_voicevox(user_id, bot_reply_v, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
             # ユーザーとボットのメッセージをFirestoreに保存
