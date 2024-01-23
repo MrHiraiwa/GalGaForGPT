@@ -226,7 +226,6 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
 
     while attempt < max_attempts:
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
-        print(f"response: {response}")
         if response:
             function_call = response.choices[0].message.function_call
             if function_call:
