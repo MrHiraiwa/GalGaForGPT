@@ -31,11 +31,18 @@ def search_wikipedia(prompt):
     try:
         wikipedia.set_lang("ja")
         search_result = wikipedia.page(prompt)
-        return "SYSTEM: 情報が見つかりました。\n" + search_result.summary
+        summary = search_result.summary
+
+        # 結果を1000文字に切り詰める
+        if len(summary) > 1000:
+            summary = summary[:1000] + "..."
+
+        return "SYSTEM: 情報が見つかりました。\n" + summary
     except wikipedia.exceptions.DisambiguationError as e:
         return f"SYSTEM: 曖昧さ解消が必要です。オプション: {e.options}"
     except wikipedia.exceptions.PageError:
         return "SYSTEM: ページが見つかりませんでした。"
+
 
 
 def scraping(links):
@@ -68,7 +75,11 @@ def scraping(links):
             text = ' '.join(content.text.split()).replace("。 ", "。\n").replace("! ", "!\n").replace("? ", "?\n").strip()
             contents.append(text)
 
-    return contents
+            # 結果を1000文字に切り詰める
+        if len(contents) > 1000:
+            summary = contents[:1000] + "..."
+
+    return summary
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
