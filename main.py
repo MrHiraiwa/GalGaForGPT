@@ -2,7 +2,7 @@ import os
 import pytz
 import requests
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from google.cloud import firestore
 from google.cloud import storage
 from google.auth.transport import requests as google_requests
