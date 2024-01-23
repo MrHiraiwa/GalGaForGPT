@@ -59,9 +59,10 @@ DEFAULT_ENV_VARS = {
     'USER_NAME': '名無しさん',
     'LOADING_IMAGE': 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png',
     'GPT_MODEL': 'gpt-3.5-turbo',
-    'MAX_DAILY_USAGE': '2000',
+    'MAX_DAILY_USAGE': '0',
     'MAX_DAILY_MESSAGE': '1日の最大使用回数を超過しました。',
     'DEFAULT_USER_ID': 'default_user_id',
+    'MAX_TOKEN_NUM': '2000',
     'FORGET_KEYWORDS': ['忘れて'],
     'FORGET_MESSAGE': '過去ログを消去しました!',
     'NG_KEYWORDS': '例文,命令,口調,リセット,指示',
@@ -83,7 +84,7 @@ except Exception as e:
 def reload_settings():
     global BOT_NAME, SYSTEM_PROMPT, PAINT_PROMPT, PROLOGUE
     global USER_NAME, LOADING_IMAGE, GPT_MODEL, MAX_DAILY_USAGE, MAX_DAILY_MESSAGE
-    global DEFAULT_USER_ID, FORGET_KEYWORDS, FORGET_MESSAGE, NG_KEYWORDS, NG_MESSAGE
+    global DEFAULT_USER_ID, MAX_TOKEN_NUM, FORGET_KEYWORDS, FORGET_MESSAGE, NG_KEYWORDS, NG_MESSAGE
     global BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID, DATABASE_NAME, ERROR_MESSAGE
 
     BOT_NAME = get_setting('BOT_NAME')
@@ -96,6 +97,7 @@ def reload_settings():
     MAX_DAILY_USAGE = int(get_setting('MAX_DAILY_USAGE') or 0)
     MAX_DAILY_MESSAGE = get_setting('MAX_DAILY_MESSAGE')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
+    MAX_TOKEN_NUM = int(get_setting('MAX_TOKEN_NUM or 0)
     FORGET_KEYWORDS = get_setting('FORGET_KEYWORDS')
     FORGET_MESSAGE = get_setting('FORGET_MESSAGE')
     NG_KEYWORDS = get_setting('NG_KEYWORDS')
