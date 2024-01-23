@@ -72,7 +72,7 @@ functions = [
                 "links": {
                     "type": "string",
                     # 引数の説明
-                    "description": "検索ワード"
+                    "description": "読みたいページのURL"
                 }
             }
         }
