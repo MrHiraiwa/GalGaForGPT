@@ -76,5 +76,24 @@ functions = [
                 }
             }
         }
+    },
+    {
+        # 関数の名称
+        "name": "get_googlesearch",
+        # 関数の機能説明
+        "description": "useful for when you need to answer questions about current events.",
+        # 関数のパラメータ
+        "parameters": {
+            "type": "object",
+            # 各引数
+            "properties": {
+                "words": {
+                    "type": "string",
+                    # 引数の説明
+                    "description": "検索ワード"
+                }
+            }
+        }
     }
+
 ]
