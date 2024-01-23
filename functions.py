@@ -131,7 +131,7 @@ def generate_image(prompt):
     public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
 
-    return "changed the scene."
+    return "SYSTEM:風景を変更しました。", public_url_original
 
 def set_username(prompt):
     username = prompt
@@ -195,7 +195,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 elif function_call.name == "generate_image" and not generate_image_called:
                     generate_image_called = True
                     arguments = json.loads(function_call.arguments)
-                    bot_reply, username = generate_image(arguments["prompt"])
+                    bot_reply, public_url_original = generate_image(arguments["prompt"])
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
