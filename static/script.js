@@ -20,13 +20,13 @@ document.getElementById('downloadButton').addEventListener('click', function() {
     fetch('/generate_image?user_id=' + userId)
         .then(response => response.json())
         .then(data => {
-            const imageUrl = data.img_url; // ここでimageUrlを定義
-            const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = 'downloadedImage.png'; // ダウンロードされるファイル名を指定
-            document.body.appendChild(link);
-            link.click(); // リンクをプログラム的にクリック
-            document.body.removeChild(link); // リンクを削除
+            const imageUrl = data.img_url; // 画像のURLを取得
+            const link = document.createElement('a'); // 新しい<a>要素を作成
+            link.href = imageUrl; // href属性に画像のURLを設定
+            link.download = 'downloadedImage.png'; // download属性にダウンロードするファイルの名前を設定
+            document.body.appendChild(link); // <a>要素をbodyに追加
+            link.click(); // プログラム的にリンクをクリック
+            document.body.removeChild(link); // <a>要素を削除
         });
 });
 
