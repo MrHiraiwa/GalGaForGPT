@@ -162,8 +162,7 @@ function setUserMessage(messageDiv, message, isUser) {
 
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    // URLを識別する改善された正規表現（英数字と一部の記号のみをURLの一部とみなす）
-    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+)/g;
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+|\n)/g;
 
     function createLinkElement(url) {
         const link = document.createElement('a');
@@ -177,7 +176,12 @@ function setBotMessage(messageDiv, message, isUser, callback) {
         let i = 0;
         let interval = setInterval(() => {
             if (i < text.length) {
-                messageDiv.textContent += text.charAt(i);
+                if (text.charAt(i) === '\n') {
+                    messageDiv.appendChild(document.createElement('br'));
+                } else {
+                    const textNode = document.createTextNode(text.charAt(i));
+                    messageDiv.appendChild(textNode);
+                }
                 i++;
                 chatBox.scrollTop = chatBox.scrollHeight;
             } else {
@@ -190,7 +194,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     function processMessage(parts, index) {
         if (index < parts.length) {
             const part = parts[index];
-            if (urlRegex.test(part)) {
+            if (urlRegex.test(part) && part !== '\n') {
                 messageDiv.appendChild(createLinkElement(part));
                 processMessage(parts, index + 1);
             } else {
@@ -207,6 +211,7 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     processMessage(parts, 0);
     messageDiv.className = 'message-animation';
 }
+
 
 
 function addBlankMessage(chatBox) {
