@@ -119,15 +119,33 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    let fullMessage = message;
+    let words = message.split(' '); // スペースでメッセージを分割
     let i = 0;
-    
+    let j = 0;
+
     function typeWriter() {
-        if (i < fullMessage.length) {
-            messageDiv.textContent += fullMessage.charAt(i);
-            i++;
-            chatBox.scrollTop = chatBox.scrollHeight;
-            setTimeout(typeWriter, 50);
+        if (j < words.length) {
+            if (isURL(words[j])) {
+                const a = document.createElement('a');
+                a.href = words[j];
+                a.textContent = words[j];
+                a.target = '_blank'; // 新しいタブでリンクを開く
+                messageDiv.appendChild(a);
+                messageDiv.appendChild(document.createTextNode(' ')); // スペースを追加
+                j++;
+                setTimeout(typeWriter, 50);
+            } else {
+                if (i < words[j].length) {
+                    messageDiv.textContent += words[j].charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    messageDiv.textContent += ' '; // 単語の後にスペースを追加
+                    i = 0;
+                    j++;
+                    setTimeout(typeWriter, 50);
+                }
+            }
         }
     }
 
@@ -136,15 +154,33 @@ function setUserMessage(messageDiv, message, isUser) {
 }
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    let fullMessage = message;
+    let words = message.split(' '); // スペースでメッセージを分割
     let i = 0;
+    let j = 0;
 
     function typeWriter() {
-        if (i < fullMessage.length) {
-            messageDiv.textContent += fullMessage.charAt(i);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            i++;
-            setTimeout(typeWriter, 50);
+        if (j < words.length) {
+            if (isURL(words[j])) {
+                const a = document.createElement('a');
+                a.href = words[j];
+                a.textContent = words[j];
+                a.target = '_blank'; // 新しいタブでリンクを開く
+                messageDiv.appendChild(a);
+                messageDiv.appendChild(document.createTextNode(' ')); // スペースを追加
+                j++;
+                setTimeout(typeWriter, 50);
+            } else {
+                if (i < words[j].length) {
+                    messageDiv.textContent += words[j].charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    messageDiv.textContent += ' '; // 単語の後にスペースを追加
+                    i = 0;
+                    j++;
+                    setTimeout(typeWriter, 50);
+                }
+            }
         } else {
             if (callback) {
                 callback(); // コールバック関数を実行
@@ -155,6 +191,18 @@ function setBotMessage(messageDiv, message, isUser, callback) {
     typeWriter();
     messageDiv.className = 'message-animation';
 }
+
+function isURL(str) {
+    // URLかどうかを判定するロジック
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // プロトコル
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // ドメイン名
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR IP (v4) アドレス
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // ポートとパス
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // クエリ文字列
+        '(\\#[-a-z\\d_]*)?$','i'); // フラグメントロケータ
+    return pattern.test(str);
+}
+
 
 function addBlankMessage(chatBox) {
     var blankDiv = document.createElement('div');
