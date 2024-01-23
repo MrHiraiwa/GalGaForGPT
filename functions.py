@@ -256,7 +256,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                 elif function_call.name == "scraping" and not scraping_called:
                     scraping_called = True
                     arguments = json.loads(function_call.arguments)
-                    bot_reply = scraping(arguments["links"])
+                    bot_reply = scraping(arguments["link"])
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 elif function_call.name == "get_googlesearch" and not get_googlesearch_called:
