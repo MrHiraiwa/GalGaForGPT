@@ -188,23 +188,20 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                     attempt += 1
                 elif function_call.name == "clock" and not clock_called:
                     clock_called = True
-                    bot_reply, _ = clock()
+                    bot_reply = clock()
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
-                    return response.choices[0].message.content, public_url_original, username
+                    response = run_conversation(GPT_MODEL, i_messages_for_api)
+                    if response:
+                        bot_reply = response.choices[0].message.content
+                    else:
+                        bot_reply = "An error occurred while processing the question"
+                    return bot_reply, public_url_original, username                    
             else:
                 return response.choices[0].message.content, public_url_original, username
         else:
             return "An error occurred while processing the question", public_url_original, username
-
-    if set_username_called or clock_called:
-        # いずれかの機能が呼び出された場合、functions機能を無効化して会話を続行
-        response = run_conversation(GPT_MODEL, i_messages_for_api)
-        if response:
-            bot_reply = response.choices[0].message.content
-        else:
-            bot_reply = "An error occurred while processing the question"
     
     return bot_reply, public_url_original, username
 
