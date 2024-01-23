@@ -50,8 +50,8 @@ function changeBackgroundImage(img_url) {
 function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.className = 'message-animation';
-
-    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+|\n)/g;
+    
+    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+)/g;
     let parts = message.split(urlRegex);
 
     parts.forEach(part => {
