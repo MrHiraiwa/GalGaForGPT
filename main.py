@@ -246,6 +246,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 def generate_image():
     user_id = request.args.get('user_id', DEFAULT_USER_ID)
     bucket_name = BACKET_NAME
+    last_access_date = ""
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
 
