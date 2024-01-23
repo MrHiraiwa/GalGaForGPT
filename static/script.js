@@ -17,9 +17,10 @@ document.getElementById("voiceToggleButton").addEventListener("click", function(
 });
 
 document.getElementById('downloadButton').addEventListener('click', function() {
-    fetch('/get_loading_image')
+    fetch('/generate_image?user_id=' + userId)
         .then(response => response.json())
         .then(data => {
+            const imageUrl = data.img_url;
             const imageUrl = data.loading_image;
             const link = document.createElement('a');
             link.href = imageUrl;
