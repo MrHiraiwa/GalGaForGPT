@@ -345,9 +345,9 @@ def texthook_handler():
 
         if any(word in user_message for word in NG_KEYWORDS):
             user_message = "SYSTEM: " + NG_MESSAGE + "\n" + user_message
-            
+
         if MAX_DAILY_USAGE is not None and daily_usage is not None and daily_usage >= MAX_DAILY_USAGE:
-                return jsonify({"reply": MAX_DAILY_MESSAGE})
+            return jsonify({"reply": MAX_DAILY_MESSAGE})
 
         total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
         
