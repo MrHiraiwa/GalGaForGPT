@@ -390,6 +390,7 @@ def get_chat_log():
     if user_doc.exists:
         user_data = user_doc.to_dict()
         messages = user_data['messages']
+        print("取得したメッセージ:", messages) 
         if not messages:
             return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
         return jsonify(messages)
