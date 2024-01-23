@@ -70,7 +70,7 @@ DEFAULT_ENV_VARS = {
     'FILE_AGE': '1',
     'VOICEVOX_URL': 'https://voicevox-engine-lt5y5bq47a-an.a.run.app',
     'VOICEVOX_STYLE_ID': '27'
-    'ERROR_MESSAGE': 'エラーが発生しました。',
+    'ERROR_MESSAGE': 'エラーが発生しました。'
 }
 
 # Firestore クライアントの初期化
