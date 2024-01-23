@@ -16,6 +16,20 @@ document.getElementById("voiceToggleButton").addEventListener("click", function(
     updateVoiceButtonLabel(); // ボタンのラベル更新
 });
 
+document.getElementById('downloadButton').addEventListener('click', function() {
+    fetch('/get_loading_image')
+        .then(response => response.json())
+        .then(data => {
+            const imageUrl = data.loading_image;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'downloadedImage.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+});
+
 document.getElementById("userInput").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
