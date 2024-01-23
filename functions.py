@@ -11,6 +11,9 @@ import functions_config as cf
 import json
 import wikipedia
 
+google_api_key = os.getenv("GOOGLE_API_KEY")
+google_cse_id = os.getenv("GOOGLE_CSE_ID")
+
 openai_api_key = os.getenv('OPENAI_API_KEY')
 gpt_client = OpenAI(api_key=openai_api_key)
 public_url = []
@@ -26,6 +29,22 @@ def clock():
     nowDate = datetime.now(jst) 
     nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
     return "SYSTEM:現在時刻は" + nowDateStr + "です。"
+
+def get_googlesearch(words, num=3, start_index=1, search_lang='lang_ja'):
+    base_url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "key": google_api_key,
+        "cx": google_cse_id,
+        "q": words,
+        "num": num,
+        "start": start_index,
+        "lr": search_lang
+    }
+
+    response = requests.get(base_url, params=params)
+    response.raise_for_status()
+
+    return "SYSTEM:Webページを検索しました。\n" + response.json()
 
 def search_wikipedia(prompt):
     try:
@@ -194,6 +213,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
     generate_image_called = False
     search_wikipedia_called = False
     scraping_called = False
+    get_googlesearch_called = False
 
     while attempt < max_attempts:
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
@@ -225,9 +245,15 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 elif function_call.name == "scraping" and not scraping_called:
-                    sscraping_called = True
+                    scraping_called = True
                     arguments = json.loads(function_call.arguments)
                     bot_reply = scraping(arguments["links"])
+                    i_messages_for_api.append({"role": "assistant", "content": bot_reply})
+                    attempt += 1
+                elif function_call.name == "get_googlesearch" and not get_googlesearch_called:
+                    get_googlesearch_called = True
+                    arguments = json.loads(function_call.arguments)
+                    bot_reply = get_googlesearch(arguments["words"])
                     i_messages_for_api.append({"role": "assistant", "content": bot_reply})
                     attempt += 1
                 else:
