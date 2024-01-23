@@ -58,5 +58,23 @@ functions = [
                 }
             }
         }
+    },
+    {
+        # 関数の名称
+        "name": "scraping",
+        # 関数の機能説明
+        "description": "useful for when you need to read a web page by specifying the URL.",
+        # 関数のパラメータ
+        "parameters": {
+            "type": "object",
+            # 各引数
+            "properties": {
+                "links": {
+                    "type": "string",
+                    # 引数の説明
+                    "description": "検索ワード"
+                }
+            }
+        }
     }
 ]
