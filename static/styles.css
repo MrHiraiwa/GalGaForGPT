@@ -28,7 +28,7 @@ body {
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
-  font-size: clamp(15px, 1vw, 25px);
+  font-size: clamp(20px, 1vw, 30px);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -36,8 +36,8 @@ body {
 
 #chatBox {
   margin: 10px 0;
-  min-height: calc(6 * 1.2em * 1.5);
-  max-height: calc(4 * 1.2em * 1.5);
+  min-height: calc(6 * 1.5em * 1.5);
+  max-height: calc(4 * 1.5em * 1.5);
   width: 100%;
   overflow-y: scroll;
   border: 1px solid #ccc;
@@ -126,6 +126,34 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
     font-size: 16px; /* フォントサイズを調整 */
 }
+
+#downloadButton {
+    position: fixed; /* 固定位置 */
+    top: 10px; /* 上から10pxの位置 */
+    left: 10px; /* 左から10pxの位置 */
+    z-index: 1000; /* 他の要素より前面に表示 */
+    padding: 5px 10px; /* パディング */
+    background-color: #333; /* 背景色 */
+    color: #fff; /* 文字色 */
+    border: 1px solid #ccc; /* ボーダー */
+    border-radius: 5px; /* 角の丸み */
+    cursor: pointer; /* カーソルをポインターに設定 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    font-size: 16px; /* フォントサイズ */
+}
+
+#downloadButton:hover {
+    background-color: #555; /* ホバー時の背景色 */
+    color: #fff;
+}
+
+#downloadButton:active,
+#downloadButton:focus {
+    background-color: #333; /* アクティブまたはフォーカス時の背景色 */
+    color: #fff;
+    outline: none; /* フォーカス時のアウトラインを削除 */
+}
+
 
 @keyframes fadeIn {
   from { opacity: 0; }

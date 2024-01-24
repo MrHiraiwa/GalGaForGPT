@@ -11,3 +11,4 @@ beautifulsoup4
 wikipedia
 openai
 Pillow
+cryptography

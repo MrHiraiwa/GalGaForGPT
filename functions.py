@@ -107,7 +107,7 @@ def scraping(link):
         if len(contents) > 1000:
             contents = contents[:1000] + "..."
 
-    return f"SYSTEM:以下は{link}の読み込み結果です。\n" + contents
+    return f"SYSTEM:以下は{link}の読み込み結果です。情報を提示するときは情報とともに参照元URLアドレスも案内してください。\n" + contents
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
@@ -175,7 +175,7 @@ def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
 
         # 元のPNG画像をアップロード
         public_url_original = upload_blob(bucket_name, png_image, blob_path)
-        return "SYSTEM:風景を変更しました。", public_url_original
+        return f"SYSTEM:{prompt}のキーワードに基づきシーンを変更しました。", public_url_original
     except Exception as e:
         return f"SYSTEM: 画像生成にエラーが発生しました。{e}"
 
@@ -226,7 +226,6 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, BUCKET_NAME=None, FI
 
     while attempt < max_attempts:
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
-        print(f"response: {response}")
         if response:
             function_call = response.choices[0].message.function_call
             if function_call:
