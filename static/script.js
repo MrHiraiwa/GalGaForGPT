@@ -65,8 +65,8 @@ function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.className = 'message-animation';
     
-    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~/?#])(?=\s|\Z|["'])
-/g;
+    const urlRegex = const urlRegex = /https?:\/\/[A-Za-z0-9-._~:\/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~\/?#](?=\s|\Z|["'])/g;
+
     let parts = message.split(urlRegex);
 
     parts.forEach(part => {
@@ -158,8 +158,7 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~/?#])(?=\s|\Z|["'])
-/g;
+    const urlRegex = const urlRegex = /https?:\/\/[A-Za-z0-9-._~:\/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~\/?#](?=\s|\Z|["'])/g;
     let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
 
     function createLinkElement(url) {
@@ -202,8 +201,7 @@ function setUserMessage(messageDiv, message, isUser) {
 
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    const urlRegex = /(https?:\/\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~/?#])(?=\s|\Z|["'])
-/g;
+    const urlRegex = const urlRegex = /https?:\/\/[A-Za-z0-9-._~:\/?#[\]@!$&'()*+,;=]*[A-Za-z0-9-_~\/?#](?=\s|\Z|["'])/g;
 
     function createLinkElement(url) {
         const link = document.createElement('a');
