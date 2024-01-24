@@ -175,7 +175,7 @@ def generate_image(paint_prompt, prompt, user_id, bucket_name, file_age):
 
         # 元のPNG画像をアップロード
         public_url_original = upload_blob(bucket_name, png_image, blob_path)
-        return "SYSTEM:風景を変更しました。", public_url_original
+        return f"SYSTEM:{prompt}のキーワードに基づき風景を変更しました。", public_url_original
     except Exception as e:
         return f"SYSTEM: 画像生成にエラーが発生しました。{e}"
 
