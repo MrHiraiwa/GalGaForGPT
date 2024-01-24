@@ -287,8 +287,9 @@ def index():
 
 @app.route("/audiohook", methods=["POST"])
 def audiohook_handler():
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     user_message = []
-    user_id = []
     audio_file = request.files['audio_data']
     user_message = get_audio(audio_file)
     return jsonify({"reply": user_message})
@@ -296,6 +297,8 @@ def audiohook_handler():
 # Texthook ハンドラ
 @app.route("/texthook", methods=["POST"])
 def texthook_handler():
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     data = request.json
     i_user_message = data.get("message")
     voice_onoff = data.get("voice_onoff")
@@ -393,7 +396,8 @@ def texthook_handler():
 
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
-    user_id = request.args.get('user_id')
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
     if user_doc.exists:
@@ -451,7 +455,8 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
 
 @app.route('/generate_image', methods=['GET'])
 def generate_image():
-    user_id = request.args.get('user_id', DEFAULT_USER_ID)
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     bucket_name = BACKET_NAME
     last_access_date = ""
     daily_usage = 0
@@ -523,7 +528,8 @@ def get_loading_image():
 
 @app.route('/get_username', methods=['GET'])
 def get_username():
-    user_id = request.args.get('user_id', DEFAULT_USER_ID) # デフォルトのユーザーIDを使用
+    assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
 
