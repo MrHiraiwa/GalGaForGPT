@@ -281,7 +281,7 @@ def url_filter(text):
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
     user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
-    print(f"assertion: {assertion}, user_id: {user_id}, user_email: {user_email}, error_str: {error_str}"
+    print(f"assertion: {assertion}, user_id: {user_id}, user_email: {user_email}, error_str: {error_str}")
     
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
