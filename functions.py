@@ -62,17 +62,17 @@ def search_wikipedia(prompt):
         wikipedia.set_lang("ja")
         search_result = wikipedia.page(prompt)
         summary = search_result.summary
+        page_url = search_result.url
 
         # 結果を1000文字に切り詰める
         if len(summary) > 1000:
             summary = summary[:1000] + "..."
 
-        return "SYSTEM: 情報が見つかりました。\n" + summary
+        return f"SYSTEM: 以下は{page_url}の読み込み結果です。情報を提示するときは情報とともに参照元URLアドレスも案内してください。\n{summary}"
     except wikipedia.exceptions.DisambiguationError as e:
         return f"SYSTEM: 曖昧さ解消が必要です。オプション: {e.options}"
     except wikipedia.exceptions.PageError:
         return "SYSTEM: ページが見つかりませんでした。"
-
 
 
 def scraping(link):

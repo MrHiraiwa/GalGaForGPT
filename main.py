@@ -13,6 +13,10 @@ import uuid
 from openai import OpenAI
 import requests
 import io
+from hashlib import md5
+import base64
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
@@ -57,7 +61,7 @@ DEFAULT_ENV_VARS = {
     'PAINT_PROMPT': '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。背景も生成し女性は背景の中に存在してください。生成IDはVyY5daXiltA2L6DNを指定します。',
     'PROLOGUE': 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。',
     'USER_NAME': '名無しさん',
-    'LOADING_IMAGE': 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png',
+    'LOADING_IMAGE': 'https://xxxxxxxxxxxxxxxxxxxxxx.png',
     'GPT_MODEL': 'gpt-3.5-turbo',
     'MAX_DAILY_USAGE': '0',
     'MAX_DAILY_MESSAGE': '1日の最大使用回数を超過しました。',
@@ -69,7 +73,7 @@ DEFAULT_ENV_VARS = {
     'NG_MESSAGE': '以下の文章はユーザーから送られたものですが拒絶してください。',
     'BACKET_NAME': 'galgegpt',
     'FILE_AGE': '1',
-    'VOICEVOX_URL': 'https://voicevox-engine-lt5y5bq47a-an.a.run.app',
+    'VOICEVOX_URL': 'https://xxxxxxxxxxxxxxxxxxxxxx.run.app',
     'VOICEVOX_STYLE_ID': '27',
     'ERROR_MESSAGE': 'エラーが発生しました。'
 }
@@ -162,6 +166,9 @@ reload_settings()
 
 # Flask アプリケーションの初期化
 app = Flask(__name__)
+app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
+hash_object = SHA256.new(data=(secret_key or '').encode('utf-8'))
+hashed_secret_key = hash_object.digest()
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
 gpt_client = OpenAI(api_key=openai_api_key)
@@ -277,6 +284,28 @@ def url_filter(text):
     # テキストからURLを削除
     text_without_urls = re.sub(url_pattern, '', text)
     return text_without_urls
+
+def get_encrypted_message(message, hashed_secret_key):
+    cipher = AES.new(hashed_secret_key, AES.MODE_ECB)
+    message = message.encode('utf-8')
+    padding = 16 - len(message) % 16
+    message += bytes([padding]) * padding
+    enc_message = base64.b64encode(cipher.encrypt(message))
+    return enc_message.decode()
+
+def get_decrypted_message(enc_message, hashed_secret_key):
+    try:
+        cipher = AES.new(hashed_secret_key, AES.MODE_ECB)
+        enc_message = base64.b64decode(enc_message.encode('utf-8'))
+        message = cipher.decrypt(enc_message)
+        padding = message[-1]
+        if padding > 16:
+            raise ValueError("Invalid padding value")
+        message = message[:-padding]
+        return message.decode().rstrip("\0")
+    except Exception as e:
+        print(f"Error decrypting message: {e}")
+        return None
 
 @app.route('/', methods=['GET'])
 def index():
