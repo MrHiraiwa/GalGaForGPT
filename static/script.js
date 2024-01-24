@@ -62,38 +62,35 @@ function changeBackgroundImage(img_url) {
 
 
 function addMessageWithAnimation(chatBox, message, isUser) {
+    vfunction addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.className = 'message-animation';
     const urlRegex = /https?:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#\u3000-\u30FE\u4E00-\u9FA0\uFF01-\uFFE3]+/g;
-    
-    let parts = message.split(urlRegex);
 
-    parts.forEach(part => {
-        if (part.match(urlRegex)) {
-            // URLの場合はリンクとして追加
-            const link = document.createElement('a');
-            link.href = part;
-            link.textContent = part;
-            link.target = '_blank';
-            messageDiv.appendChild(link);
-        } else {
-            // 非URLの場合はテキストとして処理
-            // 改行を処理
-            const lines = part.split('\n');
-            lines.forEach((line, index) => {
-                messageDiv.appendChild(document.createTextNode(line));
-                if (index < lines.length - 1) {
-                    messageDiv.appendChild(document.createElement('br'));
-                }
-            });
-        }
+    // メッセージをURLと非URLの部分に分割
+    let lastIndex = 0;
+    message.replace(urlRegex, (match, offset) => {
+        // URLの前のテキストを追加
+        messageDiv.appendChild(document.createTextNode(message.slice(lastIndex, offset)));
+        lastIndex = offset + match.length;
+
+        // URLの処理
+        const link = document.createElement('a');
+        link.href = match;
+        link.textContent = match;
+        link.target = '_blank';
+        messageDiv.appendChild(link);
     });
+
+    // 最後の非URL部分を追加
+    messageDiv.appendChild(document.createTextNode(message.slice(lastIndex)));
 
     chatBox.appendChild(messageDiv);
 
     // スムーズスクロールの実行
     messageDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
 
 
 function sendMessage() {
