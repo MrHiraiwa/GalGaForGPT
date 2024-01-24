@@ -57,8 +57,6 @@ def get_googlesearch(words, num=3, start_index=1, search_lang='lang_ja'):
     return f"SYSTEM:Webページを検索しました。{words}と関係のありそうなURLを読み込んでください。\n" + formatted_results
 
 
-import wikipedia
-
 def search_wikipedia(prompt):
     try:
         wikipedia.set_lang("ja")
