@@ -99,6 +99,10 @@ def reload_settings():
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     MAX_TOKEN_NUM = int(get_setting('MAX_TOKEN_NUM') or 0)
     FORGET_KEYWORDS = get_setting('FORGET_KEYWORDS')
+    if FORGET_KEYWORDS:
+        FORGET_KEYWORDS = FORGET_KEYWORDS.split(',')
+    else:
+        FORGET_KEYWORDS = []
     FORGET_MESSAGE = get_setting('FORGET_MESSAGE')
     NG_KEYWORDS = get_setting('NG_KEYWORDS')
     if NG_KEYWORDS:
@@ -336,7 +340,7 @@ def texthook_handler():
         
         langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話の最近の履歴です。\n" + recent_messages_str + "\n以下はユーザーの現在の問い合わせです。\n" + i_user_message
 
-        if FORGET_KEYWORDS[0] in user_message:
+        if any(word in user_message for word in FORGET_KEYWORDS):
             user_data['messages'] = []
             user_data['user_name'] = None
             user_data['updated_date_string'] = nowDate
