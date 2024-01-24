@@ -57,22 +57,24 @@ def get_googlesearch(words, num=3, start_index=1, search_lang='lang_ja'):
     return f"SYSTEM:Webページを検索しました。{words}と関係のありそうなURLを読み込んでください。\n" + formatted_results
 
 
+import wikipedia
+
 def search_wikipedia(prompt):
     try:
         wikipedia.set_lang("ja")
         search_result = wikipedia.page(prompt)
         summary = search_result.summary
+        page_url = search_result.url
 
         # 結果を1000文字に切り詰める
         if len(summary) > 1000:
             summary = summary[:1000] + "..."
 
-        return "SYSTEM: 情報が見つかりました。\n" + summary
+        return f"SYSTEM: 情報が見つかりました。\n概要: {summary}\n参照元URL: {page_url}"
     except wikipedia.exceptions.DisambiguationError as e:
         return f"SYSTEM: 曖昧さ解消が必要です。オプション: {e.options}"
     except wikipedia.exceptions.PageError:
         return "SYSTEM: ページが見つかりませんでした。"
-
 
 
 def scraping(link):
