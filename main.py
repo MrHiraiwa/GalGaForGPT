@@ -13,6 +13,10 @@ import uuid
 from openai import OpenAI
 import requests
 import io
+from hashlib import md5
+import base64
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
@@ -163,6 +167,9 @@ reload_settings()
 # Flask アプリケーションの初期化
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
+hash_object = SHA256.new(data=(secret_key or '').encode('utf-8'))
+hashed_secret_key = hash_object.digest()
+app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 
 gpt_client = OpenAI(api_key=openai_api_key)
 
@@ -277,6 +284,28 @@ def url_filter(text):
     # テキストからURLを削除
     text_without_urls = re.sub(url_pattern, '', text)
     return text_without_urls
+
+def get_encrypted_message(message, hashed_secret_key):
+    cipher = AES.new(hashed_secret_key, AES.MODE_ECB)
+    message = message.encode('utf-8')
+    padding = 16 - len(message) % 16
+    message += bytes([padding]) * padding
+    enc_message = base64.b64encode(cipher.encrypt(message))
+    return enc_message.decode()
+
+def get_decrypted_message(enc_message, hashed_secret_key):
+    try:
+        cipher = AES.new(hashed_secret_key, AES.MODE_ECB)
+        enc_message = base64.b64decode(enc_message.encode('utf-8'))
+        message = cipher.decrypt(enc_message)
+        padding = message[-1]
+        if padding > 16:
+            raise ValueError("Invalid padding value")
+        message = message[:-padding]
+        return message.decode().rstrip("\0")
+    except Exception as e:
+        print(f"Error decrypting message: {e}")
+        return None
 
 @app.route('/', methods=['GET'])
 def index():
