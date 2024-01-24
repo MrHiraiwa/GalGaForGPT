@@ -68,7 +68,7 @@ def search_wikipedia(prompt):
         if len(summary) > 1000:
             summary = summary[:1000] + "..."
 
-        return f"SYSTEM: 情報が見つかりました。\n概要: {summary}\n参照元URL: {page_url}"
+        return f"SYSTEM: 情報が見つかりました。情報を提示するときは情報とともに参照元URLアドレスも案内してください。\n概要: {summary}\n参照元URL: {page_url}"
     except wikipedia.exceptions.DisambiguationError as e:
         return f"SYSTEM: 曖昧さ解消が必要です。オプション: {e.options}"
     except wikipedia.exceptions.PageError:
