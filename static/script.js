@@ -65,7 +65,7 @@ function addMessageWithAnimation(chatBox, message, isUser) {
     var messageDiv = document.createElement('div');
     messageDiv.className = 'message-animation';
     
-    const urlRegex = /https?:\/\/[^\s)]+[^)\s\p{Han}\p{Hiragana}\p{Katakana}]/gu;
+    const urlRegex = /https?:\/\/\S+(?<![\p{Han}\p{Hiragana}\p{Katakana}\s])/gu;
 
     let parts = message.split(urlRegex);
 
@@ -158,7 +158,7 @@ function sendMessage() {
 }
 
 function setUserMessage(messageDiv, message, isUser) {
-    const urlRegex = /https?:\/\/[^\s)]+[^)\s\p{Han}\p{Hiragana}\p{Katakana}]/gu;
+    const urlRegex = /https?:\/\/\S+(?<![\p{Han}\p{Hiragana}\p{Katakana}\s])/gu;
     let fullMessage = message.split(urlRegex); // URLとその他のテキストを分割
 
     function createLinkElement(url) {
@@ -201,7 +201,7 @@ function setUserMessage(messageDiv, message, isUser) {
 
 
 function setBotMessage(messageDiv, message, isUser, callback) {
-    const urlRegex = /https?:\/\/[^\s)]+[^)\s\p{Han}\p{Hiragana}\p{Katakana}]/gu;
+    const urlRegex = /https?:\/\/\S+(?<![\p{Han}\p{Hiragana}\p{Katakana}\s])/gu;
 
     function createLinkElement(url) {
         const link = document.createElement('a');
