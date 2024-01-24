@@ -90,6 +90,7 @@ def scraping(link):
         return f"SYSTEM: リンクの読み込み中にエラーが発生しました: {e}"
 
     soup = BeautifulSoup(html, features="html.parser")
+    print(f"soup: {soup}")
 
     # Remove all 'a' tags
     for a in soup.findAll('a'):
@@ -106,6 +107,7 @@ def scraping(link):
         # 結果を1000文字に切り詰める
         if len(contents) > 1000:
             contents = contents[:1000] + "..."
+        print(f"link: {link}, contents: {contents}")
 
     return f"SYSTEM:以下は{link}の読み込み結果です。情報を提示するときは情報とともに参照元URLアドレスも案内してください。\n" + contents
 
