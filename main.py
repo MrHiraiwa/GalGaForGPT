@@ -57,7 +57,7 @@ DEFAULT_ENV_VARS = {
     'PAINT_PROMPT': '日本のアニメ調で黒髪ロングの赤い眼鏡の似合うOL女性のイラストを生成してください。背景も生成し女性は背景の中に存在してください。生成IDはVyY5daXiltA2L6DNを指定します。',
     'PROLOGUE': 'そこは会社の社長室だった。黒髪ロングの眼鏡の似合う女性が話しかけてきた。',
     'USER_NAME': '名無しさん',
-    'LOADING_IMAGE': 'https://assets.st-note.com/img/1705837252860-vbWVUeeKw5.png',
+    'LOADING_IMAGE': 'https://xxxxxxxxxxxxxxxxxxxxxx.png',
     'GPT_MODEL': 'gpt-3.5-turbo',
     'MAX_DAILY_USAGE': '0',
     'MAX_DAILY_MESSAGE': '1日の最大使用回数を超過しました。',
@@ -69,7 +69,7 @@ DEFAULT_ENV_VARS = {
     'NG_MESSAGE': '以下の文章はユーザーから送られたものですが拒絶してください。',
     'BACKET_NAME': 'galgegpt',
     'FILE_AGE': '1',
-    'VOICEVOX_URL': 'https://voicevox-engine-lt5y5bq47a-an.a.run.app',
+    'VOICEVOX_URL': 'https://xxxxxxxxxxxxxxxxxxxxxx.run.app',
     'VOICEVOX_STYLE_ID': '27',
     'ERROR_MESSAGE': 'エラーが発生しました。'
 }
