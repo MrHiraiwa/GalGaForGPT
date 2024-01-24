@@ -26,7 +26,7 @@ secret_key = os.getenv('SECRET_KEY')
 jst = pytz.timezone('Asia/Tokyo')
 nowDate = datetime.now(jst) 
 nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
-YOUR_AUDIENCE = os.getenv('YOUR_AUDIENCE')  # Google Cloud IAPのクライアントID
+AUDIENCE = os.getenv('AUDIENCE')  # Google Cloud IAPのクライアントID
 
 REQUIRED_ENV_VARS = [
     "BOT_NAME",
@@ -280,7 +280,7 @@ def url_filter(text):
 @app.route('/', methods=['GET'])
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
-    user_id, user_email, error_str = validate_iap_jwt(assertion, YOUR_AUDIENCE)
+    user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
