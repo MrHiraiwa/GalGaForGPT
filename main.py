@@ -281,7 +281,6 @@ def url_filter(text):
 def index():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
     user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
-    print(f"assertion: {assertion}, user_id: {user_id}, user_email: {user_email}, error_str: {error_str}")
     
     # この情報をフロントエンドに渡す
     return render_template('index.html', user_id=user_id, user_email=user_email)
@@ -399,6 +398,7 @@ def texthook_handler():
 def get_chat_log():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
     user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
+    print(f"assertion: {assertion}, user_id: {user_id}, user_email: {user_email}, error_str: {error_str}")
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
     if user_doc.exists:
