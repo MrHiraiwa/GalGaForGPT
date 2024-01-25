@@ -362,14 +362,8 @@ def texthook_handler():
             daily_usage = user_data['daily_usage']
             user_name = user_data['user_name']
 
-            #テスト用
-            print(f"daily_usage: {daily_usage}") 
-            nowDate_date = nowDate.date()
-            updated_date_date = updated_date.date()
-            print(f"nowDate: {nowDate}, updated_date: {updated_date}, nowDate_date: {nowDate_date}, updated_date_date:{updated_date_date}")  
             
             if nowDate.date() != updated_date.date():
-                print(f"daily_usage: {daily_usage}") 
                 daily_usage = 0
         else:
             user_data = {
@@ -444,7 +438,6 @@ def texthook_handler():
             user_data['user_name'] = user_name
             user_data['last_image_url'] = public_img_url
             daily_usage = user_data['daily_usage']
-            print(f"daily_usage: {daily_usage}") 
             transaction.set(doc_ref, user_data, merge=True)
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
         except Exception as e:
