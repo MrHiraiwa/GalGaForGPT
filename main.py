@@ -356,9 +356,13 @@ def texthook_handler():
             # 最新の5件のメッセージを取得し、内容を復号化
             recent_messages = [{**msg, 'content': get_decrypted_message(msg['content'], hashed_secret_key)} for msg in user_data['messages'][-5:]]
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
-            updated_date_string = user_data['updated_date_string']
-            updated_date = user_data['updated_date_string'].astimezone(jst)
-            if nowDate.date() != updated_date.date():
+            updated_date_str = user_data['updated_date_string']
+            # 文字列から datetime オブジェクトに変換
+            updated_date = datetime.strptime(updated_date_str, date_format)
+            # 日本標準時に変換
+            updated_date_jst = updated_date.astimezone(jst)
+
+            if nowDate.date() != updated_date_jst.date():
                 daily_usage = 0
         else:
             user_data = {
