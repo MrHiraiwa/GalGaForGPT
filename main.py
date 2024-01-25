@@ -437,10 +437,7 @@ def texthook_handler():
 
              # ユーザーとボットのメッセージを暗号化してFirestoreに保存
             user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(user_message, hashed_secret_key)})
-            user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})
-
-            # 暗号化されたメッセージをデータベースに設定
-            transaction.set(doc_ref, {**user_data, 'messages': user_data['messages']}, merge=True)            
+            user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})         
 
             user_data['daily_usage'] += 1
             user_data['updated_date'] = nowDate
@@ -448,7 +445,7 @@ def texthook_handler():
             user_data['last_image_url'] = public_img_url
             daily_usage = user_data['daily_usage']
             print(f"daily_usage: {daily_usage}") 
-            doc_ref.set(user_data, merge=True)
+            transaction.set(doc_ref, user_data, merge=True)
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
         except Exception as e:
             print(f"Error: {str(e)}")
