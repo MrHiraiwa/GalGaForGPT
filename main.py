@@ -17,6 +17,7 @@ from hashlib import md5
 import base64
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
+from dateutil import parser
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
@@ -29,8 +30,6 @@ admin_password = os.environ["ADMIN_PASSWORD"]
 secret_key = os.getenv('SECRET_KEY')
 jst = pytz.timezone('Asia/Tokyo')
 nowDate = datetime.now(jst) 
-nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
-date_format = '%Y/%m/%d %H:%M:%S %Z'
 AUDIENCE = os.getenv('AUDIENCE')  # Google Cloud IAPのクライアントID
 
 REQUIRED_ENV_VARS = [
@@ -359,11 +358,9 @@ def texthook_handler():
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
             updated_date_str = user_data['updated_date_string']
             # 文字列から datetime オブジェクトに変換
-            updated_date = datetime.strptime(updated_date_str, date_format)
-            # 日本標準時に変換
-            updated_date_jst = updated_date.astimezone(jst)
+            updated_date = parser.parse(updated_date_str)
 
-            if nowDate.date() != updated_date_jst.date():
+            if nowDate.date() != updated_date.date():
                 daily_usage = 0
         else:
             user_data = {
