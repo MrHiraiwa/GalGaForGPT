@@ -431,7 +431,7 @@ def texthook_handler():
             user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})
 
             # 暗号化されたメッセージをデータベースに設定
-             transaction.set(doc_ref, {**user_data, 'messages': user_data['messages']}, merge=True)            
+            transaction.set(doc_ref, {**user_data, 'messages': user_data['messages']}, merge=True)            
 
             user_data['daily_usage'] += 1
             user_data['updated_date_string'] = nowDate
