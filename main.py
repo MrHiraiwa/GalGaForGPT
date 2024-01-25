@@ -532,7 +532,7 @@ def generate_image():
         # ドキュメントが存在しない場合、新しいデータを作成
         user_data = {
             'messages': [],
-            'updated_date_string': nowDateStr,
+            'updated_date_string': nowDate,
             'daily_usage': 0,
             'start_free_day': datetime.now(jst),
             'user_name': USER_NAME,
