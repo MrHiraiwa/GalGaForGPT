@@ -442,7 +442,7 @@ def texthook_handler():
         except Exception as e:
             print(f"Error: {str(e)}")
             return jsonify({"error": "Unable to process your request"}), 500
-       return update_in_transaction(db.transaction(), doc_ref)
+    return update_in_transaction(db.transaction(), doc_ref)
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
