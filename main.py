@@ -17,7 +17,6 @@ from hashlib import md5
 import base64
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
-from dateutil import parser
 
 from voicevox import put_audio_voicevox
 from whisper import get_audio
