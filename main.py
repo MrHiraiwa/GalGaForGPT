@@ -357,6 +357,11 @@ def texthook_handler():
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
             updated_date = user_data['updated_date']
             updated_date = updated_date.astimezone(jst)
+
+            #テスト用
+            nowDate_date = nowDate.date()
+            updated_date_date = updated_date.date()
+            print(f"nowDate: {nowDate}, updated_date: {updated_date}, nowDate_date: {nowDate_date}, updated_date_date:{updated_date_date}")  
             
             if nowDate.date() != updated_date.date():
                 daily_usage = 0
