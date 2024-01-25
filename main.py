@@ -445,6 +445,7 @@ def texthook_handler():
             print(f"Error: {str(e)}")
             return jsonify({"error": "Unable to process your request"}), 500
     return update_in_transaction(db.transaction(), doc_ref)
+    
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
@@ -453,13 +454,17 @@ def get_chat_log():
     user_doc = doc_ref.get()
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        messages = []
-        for msg in user_data['messages']:
-            decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
-            messages.append({'role': msg['role'], 'content': decrypted_content})
-        if not messages:
+
+        # 'messages' キーが存在するかどうかをチェック
+        if 'messages' in user_data and user_data['messages']:
+            messages = []
+            for msg in user_data['messages']:
+                decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
+                messages.append({'role': msg['role'], 'content': decrypted_content})
+            return jsonify(messages)
+        else:
+            # 'messages' キーがない場合、または空の場合
             return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
-        return jsonify(messages)
     else:        
         return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
 
