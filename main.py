@@ -350,6 +350,7 @@ def texthook_handler():
         user_name = USER_NAME
         recent_messages_str = ""
         bot_reply = ""
+        updated_date_string = nowDate
         if user_doc.exists:
             user_data = user_doc.to_dict()
             # 最新の5件のメッセージを取得し、内容を復号化
