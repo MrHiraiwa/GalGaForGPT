@@ -350,6 +350,8 @@ def texthook_handler():
         recent_messages_str = ""
         bot_reply = ""
         updated_date = nowDate
+        daily_usage = 0
+        user_name = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
             # 最新の5件のメッセージを取得し、内容を復号化
@@ -357,6 +359,8 @@ def texthook_handler():
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
             updated_date = user_data['updated_date']
             updated_date = updated_date.astimezone(jst)
+            daily_usage = user_data['daily_usage']
+            user_name = user_data['user_name']
 
             #テスト用
             nowDate_date = nowDate.date()
@@ -374,8 +378,6 @@ def texthook_handler():
                 'user_name': USER_NAME,
                 'last_image_url': ""
             }
-        daily_usage = user_data['daily_usage']
-        user_name = user_data['user_name']
 
         if user_name is None:
             user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
