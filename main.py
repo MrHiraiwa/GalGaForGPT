@@ -352,8 +352,12 @@ def texthook_handler():
         bot_reply = ""
         if user_doc.exists:
             user_data = user_doc.to_dict()
-            recent_messages = user_data['messages'][-5:]
+            # 最新の5件のメッセージを取得し、内容を復号化
+            recent_messages = [{**msg, 'content': get_decrypted_message(msg['content'], hashed_secret_key)} for msg in user['messages'][-5:]]
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
+            updated_date = user['updated_date_string'].astimezone(jst)
+            if nowDate.date() != updated_date.date():
+                daily_usage = 0
         else:
             user_data = {
                 'messages': [],
@@ -386,13 +390,27 @@ def texthook_handler():
         if MAX_DAILY_USAGE is not None and daily_usage is not None and daily_usage >= MAX_DAILY_USAGE:
             return jsonify({"reply": MAX_DAILY_MESSAGE})
 
-        total_chars = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_message)) + sum([len(encoding.encode(msg['content'])) for msg in user_data['messages']])
-        
-        while total_chars > MAX_TOKEN_NUM and len(user_data['messages']) > 0:
-            user_data['messages'].pop(0)
-
         # OpenAI API へのリクエスト
-        messages_for_api = [{'role': 'system', 'content': SYSTEM_PROMPT}] + [{'role': 'assistant', 'content': PROLOGUE}] + [{'role': msg['role'], 'content': msg['content']} for msg in user_data['messages']] + [{'role': 'user', 'content': user_message}]
+        messages_for_api = [
+            {'role': 'system', 'content': SYSTEM_PROMPT},
+            {'role': 'assistant', 'content': PROLOGUE}
+        ]
+
+        # user_data['messages'] 内の各メッセージを復号化し、リストに追加
+        for msg in user_data['messages']:
+            decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
+            messages_for_api.append({'role': msg['role'], 'content': decrypted_content})
+
+        # ユーザーの最新メッセージを追加
+        messages_for_api.append({'role': 'user', 'content': user_message})
+
+        # 各メッセージのエンコードされた文字数を合計
+        total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
+
+        # トークン数が制限を超えていれば、最古のメッセージから削除
+        while total_chars > MAX_TOKEN_NUM and len(messages_for_api) > 3:
+            removed_message = messages_for_api.pop(3)  # 最初の3つはシステムとアシスタントのメッセージなので保持
+            total_chars -= len(encoding.encode(removed_message['content']))
 
         try:
             bot_reply, public_img_url, i_user_name = chatgpt_functions(GPT_MODEL, messages_for_api, user_id, BACKET_NAME, FILE_AGE, PAINT_PROMPT)
@@ -403,27 +421,28 @@ def texthook_handler():
             if not public_img_url:
                 public_img_url = user_data['last_image_url']
             
-
             if voice_onoff:
                 bot_reply_v = url_filter(bot_reply)
                 public_url, local_path = put_audio_voicevox(user_id, bot_reply_v, BACKET_NAME, FILE_AGE, VOICEVOX_URL, VOICEVOX_STYLE_ID)
             bot_reply = BOT_NAME + ":" + bot_reply
 
-            # ユーザーとボットのメッセージをFirestoreに保存
-            user_data['messages'].append({'role': 'user', 'content': user_message})
-            user_data['messages'].append({'role': 'assistant', 'content': bot_reply})
+             # ユーザーとボットのメッセージを暗号化してFirestoreに保存
+            user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(user_message, hashed_secret_key)})
+            user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})
+
+            # 暗号化されたメッセージをデータベースに設定
+             transaction.set(doc_ref, {**user_data, 'messages': user_data['messages']}, merge=True)            
+
             user_data['daily_usage'] += 1
             user_data['updated_date_string'] = nowDate
             user_data['user_name'] = user_name
             user_data['last_image_url'] = public_img_url
             doc_ref.set(user_data, merge=True)
-
             return jsonify({"reply": bot_reply, "audio_url": public_url, "img_url": public_img_url})
         except Exception as e:
-            print(f"APIError with OpenAI API: {str(e)}")
+            print(f"Error: {str(e)}")
             return jsonify({"error": "Unable to process your request"}), 500
-    return update_in_transaction(db.transaction(), doc_ref)
-
+       return update_in_transaction(db.transaction(), doc_ref)
 @app.route('/get_chat_log', methods=['GET'])
 def get_chat_log():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
