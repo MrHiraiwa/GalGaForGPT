@@ -30,6 +30,7 @@ secret_key = os.getenv('SECRET_KEY')
 jst = pytz.timezone('Asia/Tokyo')
 nowDate = datetime.now(jst) 
 nowDateStr = nowDate.strftime('%Y/%m/%d %H:%M:%S %Z')
+date_format = '%Y/%m/%d %H:%M:%S %Z'
 AUDIENCE = os.getenv('AUDIENCE')  # Google Cloud IAPのクライアントID
 
 REQUIRED_ENV_VARS = [
