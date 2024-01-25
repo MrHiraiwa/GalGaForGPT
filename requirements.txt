@@ -12,3 +12,4 @@ wikipedia
 openai
 Pillow
 cryptography
+python-dateutil
