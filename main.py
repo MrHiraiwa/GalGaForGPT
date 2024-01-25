@@ -350,22 +350,20 @@ def texthook_handler():
         user_name = USER_NAME
         recent_messages_str = ""
         bot_reply = ""
-        updated_date_string = nowDate
+        updated_date = nowDate
         if user_doc.exists:
             user_data = user_doc.to_dict()
             # 最新の5件のメッセージを取得し、内容を復号化
             recent_messages = [{**msg, 'content': get_decrypted_message(msg['content'], hashed_secret_key)} for msg in user_data['messages'][-5:]]
             recent_messages_str = "\n".join([msg['content'] for msg in recent_messages])
-            updated_date_str = user_data['updated_date_string']
-            # 文字列から datetime オブジェクトに変換
-            updated_date = parser.parse(updated_date_str)
+            updated_date = user_data['updated_date']
 
             if nowDate.date() != updated_date.date():
                 daily_usage = 0
         else:
             user_data = {
                 'messages': [],
-                'updated_date_string': nowDate,
+                'updated_date': nowDate,
                 'daily_usage': 0,
                 'start_free_day': datetime.now(jst),
                 'user_name': USER_NAME,
@@ -382,7 +380,7 @@ def texthook_handler():
         if any(word in user_message for word in FORGET_KEYWORDS):
             user_data['messages'] = []
             user_data['user_name'] = None
-            user_data['updated_date_string'] = nowDate
+            user_data['updated_date'] = nowDate
             doc_ref.set(user_data, merge=True)
             return jsonify({"reply": FORGET_MESSAGE})
 
@@ -436,7 +434,7 @@ def texthook_handler():
             transaction.set(doc_ref, {**user_data, 'messages': user_data['messages']}, merge=True)            
 
             user_data['daily_usage'] += 1
-            user_data['updated_date_string'] = nowDate
+            user_data['updated_date'] = nowDate
             user_data['user_name'] = user_name
             user_data['last_image_url'] = public_img_url
             doc_ref.set(user_data, merge=True)
@@ -525,14 +523,14 @@ def generate_image():
     # Firestoreドキュメントが存在するかチェック
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        last_access_date = user_data.get('updated_date_string')
+        last_access_date = user_data.get('updated_date')
         last_image_url = user_data.get('last_image_url', None)
         daily_usage = user_data.get('daily_usage', 0)
     else:
         # ドキュメントが存在しない場合、新しいデータを作成
         user_data = {
             'messages': [],
-            'updated_date_string': nowDate,
+            'updated_date': nowDate,
             'daily_usage': 0,
             'start_free_day': datetime.now(jst),
             'user_name': USER_NAME,
@@ -571,7 +569,7 @@ def generate_image():
 
         # 新しい画像URLと最終アクセス日時をFirestoreに保存
         user_data['last_image_url'] = public_url_original
-        user_data['updated_date_string'] = nowDate
+        user_data['updated_date'] = nowDate
         doc_ref.set(user_data, merge=True)
 
         return jsonify({"img_url": public_url_original})
