@@ -378,8 +378,6 @@ def texthook_handler():
             user_name = USER_NAME  # user_nameがNoneの場合、デフォルト値を使用
         
         user_message = user_name + ":" + i_user_message
-        
-        langchain_prompt = SYSTEM_PROMPT + "\n以下はユーザーの会話の最近の履歴です。\n" + recent_messages_str + "\n以下はユーザーの現在の問い合わせです。\n" + i_user_message
 
         if any(word in user_message for word in FORGET_KEYWORDS):
             user_data['messages'] = []
@@ -455,8 +453,10 @@ def get_chat_log():
     user_doc = doc_ref.get()
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        messages = user_data['messages']
-        print("取得したメッセージ:", messages) 
+        messages = []
+        for msg in user_data['messages']:
+            decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
+            messages.append({'role': msg['role'], 'content': decrypted_content})
         if not messages:
             return jsonify([{'role': 'assistant', 'content': PROLOGUE}])
         return jsonify(messages)
