@@ -515,7 +515,7 @@ def generate_image():
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
     user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     bucket_name = BACKET_NAME
-    last_access_date = ""
+    updated_date = ""
     daily_usage = 0
     last_image_url = ""
     doc_ref = db.collection(u'users').document(user_id)
@@ -524,7 +524,8 @@ def generate_image():
     # Firestoreドキュメントが存在するかチェック
     if user_doc.exists:
         user_data = user_doc.to_dict()
-        last_access_date = user_data.get('updated_date')
+        updated_date = user_data.get('updated_date')
+        updated_date = updated_date.astimezone(jst)
         last_image_url = user_data.get('last_image_url', None)
         daily_usage = user_data.get('daily_usage', 0)
         print(f"daily_usage: {daily_usage}") 
@@ -540,7 +541,7 @@ def generate_image():
         }
 
     # 最終アクセスが今日の場合、前回のURLを返す
-    if 1 <= daily_usage and last_image_url:
+    if nowDate.date() <= updated_date.date() and last_image_url:
         return jsonify({"img_url": last_image_url})
     # 新しい画像を生成
     filename = str(uuid.uuid4())
