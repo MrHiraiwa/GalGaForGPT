@@ -326,6 +326,7 @@ def audiohook_handler():
 # Texthook ハンドラ
 @app.route("/texthook", methods=["POST"])
 def texthook_handler():
+    reload_settings()
     assertion = request.headers.get('X-Goog-IAP-JWT-Assertion')
     user_id, user_email, error_str = validate_iap_jwt(assertion, AUDIENCE)
     data = request.json
