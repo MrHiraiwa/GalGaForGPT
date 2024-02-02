@@ -573,6 +573,7 @@ def generate_image():
 
         # 新しい画像URLをFirestoreに保存
         user_data['last_image_url'] = public_url_original
+        user_data['updated_date'] = nowDate
         doc_ref.set(user_data, merge=True)
 
         return jsonify({"img_url": public_url_original})
