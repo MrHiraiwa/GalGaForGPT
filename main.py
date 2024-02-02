@@ -364,7 +364,7 @@ def texthook_handler():
             user_name = user_data['user_name']
 
             
-            if nowDate.date() != updated_date.date():
+            if nowDate.date() > updated_date.date():
                 daily_usage = 0
         else:
             user_data = {
