@@ -571,9 +571,8 @@ def generate_image():
         # 元のPNG画像をアップロード
         public_url_original = upload_blob(bucket_name, png_image, blob_path)
 
-        # 新しい画像URLと最終アクセス日時をFirestoreに保存
+        # 新しい画像URLをFirestoreに保存
         user_data['last_image_url'] = public_url_original
-        user_data['updated_date'] = nowDate
         doc_ref.set(user_data, merge=True)
 
         return jsonify({"img_url": public_url_original})
