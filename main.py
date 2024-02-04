@@ -350,6 +350,8 @@ def texthook_handler():
         user_name = USER_NAME
         recent_messages_str = ""
         bot_reply = ""
+        jst = pytz.timezone('Asia/Tokyo')
+        nowDate = datetime.now(jst) 
         updated_date = nowDate
         daily_usage = 0
         user_name = ""
@@ -518,6 +520,8 @@ def generate_image():
     bucket_name = BACKET_NAME
     updated_date = ""
     daily_usage = 0
+    jst = pytz.timezone('Asia/Tokyo')
+    nowDate = datetime.now(jst) 
     last_image_url = ""
     doc_ref = db.collection(u'users').document(user_id)
     user_doc = doc_ref.get()
