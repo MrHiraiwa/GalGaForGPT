@@ -530,6 +530,8 @@ def generate_image():
         last_image_url = user_data.get('last_image_url', None)
         daily_usage = user_data.get('daily_usage', 0)
         print(f"daily_usage: {daily_usage}") 
+        if nowDate.date() > updated_date.date():
+            daily_usage = 0
     else:
         # ドキュメントが存在しない場合、新しいデータを作成
         user_data = {
