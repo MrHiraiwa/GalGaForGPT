@@ -26,7 +26,7 @@ body {
   width: 100%;
   box-sizing: border-box;
   font-size: clamp(20px, 1vw, 30px);
-  background-size: contain;
+  background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
 }
