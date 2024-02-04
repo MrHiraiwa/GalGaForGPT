@@ -29,9 +29,10 @@ body {
   width: 100%;
   box-sizing: border-box;
   font-size: clamp(20px, 1vw, 30px);
-  background-size: cover;
+  /* 以下の背景設定を削除または変更 */
+  /* background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: no-repeat; */
 }
 
 #chatBox {
