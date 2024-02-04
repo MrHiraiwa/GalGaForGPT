@@ -13,9 +13,6 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: -1; /* 背景に配置 */
-  background-size: contain;
-  background-position: top;
-  background-repeat: no-repeat;
 }
 
 body {
@@ -29,10 +26,9 @@ body {
   width: 100%;
   box-sizing: border-box;
   font-size: clamp(20px, 1vw, 30px);
-  /* 以下の背景設定を削除または変更 */
-  /* background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat; */
+  background-size: contain;
+  background-position: top;
+  background-repeat: no-repeat;
 }
 
 #chatBox {
